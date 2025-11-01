@@ -1,19 +1,48 @@
-<div class="sidebar">
-  <div class="sidebar-wrapper">
-    <div class="logo">
-      <a href="/dashboard" class="simple-text logo-normal" style="font-size: x-large">
-        SCPI INVEST +
-      </a>
+<div class="jira-sidebar" [class.collapsed]="isCollapsed">
+  <button class="sidebar-toggle" (click)="toggleSidebar()" title="Réduire / Agrandir">
+    <i [class]="isCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+  </button>
+
+  <div class="brand-section">
+    <div class="logo-square">
+      <i class="pi pi-chart-bar"></i>
     </div>
-    <div style="margin-top:40%">
+    <div class="brand-info" *ngIf="!isCollapsed">
+      <span class="brand-name">SCPI INVEST</span>
+      <span class="brand-tagline">Document Manager</span>
     </div>
-    <ul class="nav">
-      <li *ngFor="let menuItem of menuItems" class="nav-item">
-        <a class="nav-link" [routerLink]="menuItem.path">
-          <i class="{{menuItem.icon}}"></i>
-          <p>{{ menuItem.key | translate }}</p>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav-list">
+      <li *ngFor="let menuItem of menuItems" class="nav-item" [class.active]="isActive(menuItem.path)">
+        <a [routerLink]="[menuItem.path]" class="nav-link">
+          <span class="nav-icon"><i [class]="menuItem.icon"></i></span>
+          <span class="nav-label" *ngIf="!isCollapsed">{{ menuItem.key | translate }}</span>
         </a>
       </li>
     </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="footer-actions" *ngIf="!isCollapsed">
+      <button class="footer-btn" title="Paramètres"><i class="pi pi-cog"></i></button>
+      <button class="footer-btn" title="Aide"><i class="pi pi-question-circle"></i></button>
+      <button class="footer-btn" title="Notifications"><i class="pi pi-bell"></i></button>
+    </div>
+
+    <div class="footer-actions" *ngIf="isCollapsed">
+      <div class="dropdown" (click)="$event.stopPropagation()">
+        <button class="footer-btn" (click)="toggleFooterMenu()" title="Plus d’options">
+          <i class="pi pi-ellipsis-h"></i>
+        </button>
+
+        <div class="dropdown-menu" *ngIf="footerMenuOpen">
+          <button (click)="openSettings()"><i class="pi pi-cog"></i> Paramètres</button>
+          <button (click)="openHelp()"><i class="pi pi-question-circle"></i> Aide</button>
+          <button (click)="openNotifications()"><i class="pi pi-bell"></i> Notifications</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

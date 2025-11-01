@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'scpi-front' title`, () => {
+  it(`should have the 'scpi-doc-validation-front' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('scpi-front');
+    expect(app.title).toEqual('scpi-doc-validation-front');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, scpi-front');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, scpi-doc-validation-front');
   });
 });

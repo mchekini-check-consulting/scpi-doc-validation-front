@@ -1,78 +1,98 @@
-import { Component, OnInit } from "@angular/core";
-import { NgForOf, NgIf } from "@angular/common";
-import { RouterLink } from "@angular/router";
-import { TranslateModule } from "@ngx-translate/core";
+import {
+  Component,
+  EventEmitter,
+  Output,
+  HostListener,
+  OnInit,
+} from '@angular/core';
+import { CommonModule, NgForOf, NgIf } from '@angular/common';
+import { Router, RouterModule } from '@angular/router';
+import { TranslateModule } from '@ngx-translate/core';
 
-declare interface RouteInfo {
+interface RouteInfo {
   path: string;
   title: string;
   icon: string;
-  class: string;
   key: string;
-  feature: string;
 }
 
 export const ROUTES: RouteInfo[] = [
   {
-    path: "/scpi",
-    title: "Liste des SCPI",
-    key: "SIDEBAR.SCPI",
-    icon: "pi pi-building-columns",
-    class: "",
-    feature: "list-scpi",
+    path: '/dashboard',
+    title: 'Dashboard',
+    key: 'SIDEBAR.DASHBOARD',
+    icon: 'pi pi-home',
   },
   {
-    path: "/portefeuille",
-    title: "Portefeuille",
-    key: "SIDEBAR.PORTEFEUILLE",
-    icon: "pi pi-wallet",
-    class: "",
-    feature: "portefeuille",
+    path: '/tasks',
+    title: 'Tasks Board',
+    key: 'SIDEBAR.TASKS',
+    icon: 'pi pi-briefcase',
   },
+
   {
-    path: "/scheduled-payment",
-    title: "Versements programmés",
-    key: "SIDEBAR.VERSEMENT",
-    icon: "pi pi-calendar-clock",
-    class: "",
-    feature: "scheduled-payment",
+    path: '/demand-history',
+    title: 'Demand History',
+    key: 'SIDEBAR.DEMAND-HISTORY',
+    icon: 'pi pi-list',
   },
-  {
-    path: "/simulation",
-    title: "Mes simulations",
-    key: "SIDEBAR.SIMULATION",
-    icon: "pi pi-chart-line",
-    class: "",
-    feature: "simulation",
-  },
-  {
-    path: "/profile",
-    title: "Documents Réglemenataires",
-    key: "SIDEBAR.MY-PROFILE",
-    icon: "pi pi-user",
-    class: "",
-    feature: "profile",
-  }
 ];
 
 @Component({
-  selector: "app-sidebar",
-  imports: [NgForOf, TranslateModule, RouterLink, NgIf],
-  templateUrl: "./sidebar.component.html",
+  selector: 'app-sidebar',
   standalone: true,
-  styleUrl: "./sidebar.component.css",
+  imports: [CommonModule, NgForOf, NgIf, RouterModule, TranslateModule],
+  templateUrl: './sidebar.component.html',
+  styleUrls: ['./sidebar.component.css'],
 })
 export class SidebarComponent implements OnInit {
-  version = "1.0.0";
+  @Output() toggle = new EventEmitter<boolean>();
   menuItems: RouteInfo[] = [];
+  isCollapsed = false;
+  footerMenuOpen = false;
 
-  constructor() {
+  constructor(private router: Router) {}
 
+  ngOnInit(): void {
+    this.menuItems = ROUTES;
   }
 
-  ngOnInit() {
-    this.menuItems = ROUTES.filter((menuItem) => menuItem);
+  toggleSidebar(): void {
+    this.isCollapsed = !this.isCollapsed;
+    this.toggle.emit(this.isCollapsed);
+    this.footerMenuOpen = false;
   }
 
+  isActive(path: string): boolean {
+    return this.router.url.startsWith(path);
+  }
 
+  @HostListener('document:click', ['$event'])
+  onOutsideClick(event: MouseEvent): void {
+    const insideSidebar = (event.target as HTMLElement).closest(
+      '.jira-sidebar'
+    );
+    if (!insideSidebar && this.footerMenuOpen) {
+      this.footerMenuOpen = false;
+    }
+  }
+
+  toggleFooterMenu(): void {
+    this.footerMenuOpen = !this.footerMenuOpen;
+  }
+
+  openSettings(): void {
+    console.log('Paramètres ouverts');
+    this.footerMenuOpen = false;
+  }
+
+  openHelp(): void {
+    console.log('Aide ouverte');
+    this.footerMenuOpen = false;
+  }
+
+  openNotifications(): void {
+    console.log('Notifications ouvertes');
+    this.footerMenuOpen = false;
+  }
 }

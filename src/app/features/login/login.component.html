@@ -1,0 +1,75 @@
+<section class="login-page">
+  <div class="login-left">
+    <div class="brand">
+      <div class="logo-square"><i class="pi pi-chart-bar"></i></div>
+      <div class="brand-info">
+        <h1>SCPI INVEST</h1>
+        <p>DOCUMENT MANAGER</p>
+      </div>
+    </div>
+
+    <h2 class="headline">Gestion documentaire simplifiée</h2>
+    <p class="description">
+      Gérez vos documents en toute simplicité avec notre plateforme intuitive.
+      Stockez, validez et suivez vos données d’investissement en un seul endroit.
+    </p>
+
+    <div class="progress-animation">
+      <div class="progress-line"></div>
+
+      <div class="progress-step step1 active">
+        <i class="pi pi-upload"></i>
+        <span>Importation</span>
+      </div>
+      <div class="progress-step step2">
+        <i class="pi pi-cog"></i>
+        <span>Contrôle</span>
+      </div>
+      <div class="progress-step step3">
+        <i class="pi pi-check-circle"></i>
+        <span>Validation</span>
+      </div>
+      <div class="progress-step step4">
+        <i class="pi pi-database"></i>
+        <span>Archivage</span>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <a href="#">Documentation</a> •
+      <a href="#">Support</a> •
+      <a href="#">Téléchargement</a>
+    </footer>
+  </div>
+
+  <div class="login-right">
+    <div class="login-card">
+      <form (ngSubmit)="onLogin()" #f="ngForm">
+        <label>Nom d’utilisateur</label>
+        <input
+          type="text"
+          name="username"
+          [(ngModel)]="username"
+          placeholder="Entrez votre identifiant"
+          required
+        />
+
+        <label>Mot de passe</label>
+        <input
+          type="password"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Entrez votre mot de passe"
+          required
+        />
+
+        <div class="error" *ngIf="error">{{ error }}</div>
+
+        <button class="btn-login" type="submit" [disabled]="isLoading || !f.valid">
+          <span *ngIf="!isLoading">Se connecter</span>
+          <span *ngIf="isLoading">Connexion...</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</section>

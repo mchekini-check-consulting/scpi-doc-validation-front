@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ScpiCatalogComponent } from './scpi-catalog.component';
+import { TaskComponent } from './task.component';
 
-describe('ScpiCatalogComponent', () => {
-  let component: ScpiCatalogComponent;
-  let fixture: ComponentFixture<ScpiCatalogComponent>;
+describe('TaskComponent', () => {
+  let component: TaskComponent;
+  let fixture: ComponentFixture<TaskComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ScpiCatalogComponent]
+      imports: [TaskComponent]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ScpiCatalogComponent);
+    fixture = TestBed.createComponent(TaskComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

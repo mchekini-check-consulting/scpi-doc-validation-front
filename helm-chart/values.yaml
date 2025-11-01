@@ -1,6 +1,6 @@
 image:
   repo: mchekini
-  name: scpi-inv-front
+  name: scpi-doc-validation-front
   tag:  latest
 
 ingressPrefix: int

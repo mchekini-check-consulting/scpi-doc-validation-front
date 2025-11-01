@@ -10,7 +10,7 @@ import { environment } from '../environments/environment';
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'scpi-front';
+  title = 'scpi-doc-validation-front';
   ngOnInit() {
     console.log('🌍 Environment:', environment.environmentName);
 

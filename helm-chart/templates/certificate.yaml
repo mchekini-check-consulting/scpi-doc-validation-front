@@ -1,7 +1,7 @@
 apiVersion: cert-manager.io/v1
 kind: Certificate
 metadata:
-  name: scpi-inv-front-tls
+  name: scpi-doc-validation-front-tls
 spec:
   issuerRef:
     group: cert-manager.io
@@ -9,7 +9,7 @@ spec:
     name: lets-encrypt
   secretName: scpi-inv-front-tls
   dnsNames:
-    - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}scpi-inv.check-consulting.net
+    - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
   usages:
     - digital signature
     - key encipherment

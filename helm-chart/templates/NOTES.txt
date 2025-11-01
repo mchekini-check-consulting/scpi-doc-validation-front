@@ -1,1 +1,1 @@
-Scpi invest Front deployed succesfully 
+Scpi Document Manager Front deployed succesfully 

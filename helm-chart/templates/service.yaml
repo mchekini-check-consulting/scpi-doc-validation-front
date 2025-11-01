@@ -1,10 +1,10 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: scpi-inv-front
+  name: scpi-doc-validation-front
 spec:
   selector:
-    app: scpi-inv-front
+    app: scpi-doc-validation-front
   ports:
     - protocol: TCP
       port: 80

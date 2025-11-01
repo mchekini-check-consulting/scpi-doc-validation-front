@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: scpi-inv-front
+  name: scpi-doc-validation-front
   labels:
-    app: scpi-inv-front
+    app: scpi-doc-validation-front
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: scpi-inv-front
+      app: scpi-doc-validation-front
   template:
     metadata:
-      name: scpi-inv-front
+      name: scpi-doc-validation-front
       labels:
-        app: scpi-inv-front
+        app: scpi-doc-validation-front
     spec:
       containers:
-        - name: scpi-inv-front
+        - name: scpi-doc-validation-front
           image: "{{.Values.image.repo}}/{{.Values.image.name}}:{{.Values.image.tag}}"
           imagePullPolicy: Always
           ports:

@@ -1,30 +1,30 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: scpi-inv-front
+  name: scpi-doc-validation-front
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   rules:
-    - host: {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}scpi-inv.check-consulting.net
+    - host: {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
       http:
         paths:
           - path: /api
             pathType: Prefix
             backend:
               service:
-                name: scpi-inv-api
+                name: scpi-doc-validation-api
                 port:
                   number: 8080
           - path: /
             pathType: Prefix
             backend:
               service:
-                name: scpi-inv-front
+                name: scpi-doc-validation-front
                 port:
                   number: 80
   tls:
     - hosts:
-        - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}scpi-inv.check-consulting.net
-      secretName: scpi-inv-front-tls
+        - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
+      secretName: scpi-doc-validation-front-tls
