@@ -1,6 +1,5 @@
 import { Component } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { environment } from '../environments/environment';
 
 @Component({
   selector: 'app-root',
@@ -12,7 +11,6 @@ import { environment } from '../environments/environment';
 export class AppComponent {
   title = 'scpi-doc-validation-front';
   ngOnInit() {
-    console.log('🌍 Environment:', environment.environmentName);
 
   }
 }
