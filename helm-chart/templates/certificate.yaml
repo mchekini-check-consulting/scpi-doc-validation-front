@@ -7,7 +7,7 @@ spec:
     group: cert-manager.io
     kind: ClusterIssuer
     name: lets-encrypt
-  secretName: scpi-inv-front-tls
+  secretName: scpi-doc-validation-front-tls
   dnsNames:
     - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
   usages:
