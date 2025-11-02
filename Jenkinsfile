@@ -18,7 +18,7 @@ node("ci-node") {
   stage("Push Docker image") {
     withCredentials([usernamePassword(credentialsId: 'mchekini', passwordVariable: 'password', usernameVariable: 'username')]) {
       sh "sudo docker login -u $username -p $password"
-      sh "sudo docker push mchekini/sscpi-doc-validation-front:$GIT_COMMIT_HASH"
+      sh "sudo docker push mchekini/scpi-doc-validation-front:$GIT_COMMIT_HASH"
       sh "sudo docker rmi mchekini/scpi-doc-validation-front:$GIT_COMMIT_HASH"
     }
   }
