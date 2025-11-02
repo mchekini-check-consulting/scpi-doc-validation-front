@@ -3,10 +3,11 @@ kind: Certificate
 metadata:
   name: scpi-doc-validation-front-tls
 spec:
-  secretName: scpi-doc-validation-front-tls
   issuerRef:
-    name: lets-encrypt
+    group: cert-manager.io
     kind: ClusterIssuer
+    name: lets-encrypt
+  secretName: scpi-doc-validation-front-tls
   dnsNames:
     - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
   usages:

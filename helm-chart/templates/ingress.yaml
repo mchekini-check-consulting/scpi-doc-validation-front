@@ -3,29 +3,27 @@ kind: Ingress
 metadata:
   name: scpi-doc-validation-front
   annotations:
-    cert-manager.io/cluster-issuer: "lets-encrypt"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 spec:
   ingressClassName: nginx
   rules:
     - host: {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
       http:
         paths:
-            - path: /
-              pathType: Prefix
-              backend:
-                service:
-                  name: scpi-doc-validation-front
-                  port:
-                    number: 80
-              - path: /api
-                pathType: Prefix
-                backend:
-                  service:
-                    name: scpi-doc-validation-api
-                    port:
-                      number: 8080
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: scpi-doc-validation-api
+                port:
+                  number: 8080
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: scpi-doc-validation-front
+                port:
+                  number: 80
   tls:
     - hosts:
         - {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
