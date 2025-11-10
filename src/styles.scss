@@ -75,25 +75,9 @@ app-sidebar {
   left: var(--sidebar-collapsed-width);
 }
 
-.main-content {
-  position: absolute;
-  top: var(--navbar-height);
-  left: var(--sidebar-width);
-  right: 0;
-  bottom: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
-  padding: 24px 40px;
-  background-color: var(--bg-light);
-  transition: left var(--transition);
-  box-sizing: border-box;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-}
-
 .sidebar-collapsed .main-content {
   left: var(--sidebar-collapsed-width);
+  justify-content: center;
 }
 
 .jira-sidebar .sidebar-toggle {
@@ -231,4 +215,16 @@ app-sidebar {
 
 .empty-card.blue .icon-wrapper {
   background: linear-gradient(135deg, #0065ff, #2684ff);
+}
+
+.main-content.dashboard-container {
+  padding: 0 !important;
+  display: block !important;
+  justify-content: flex-start !important;
+  align-items: stretch !important;
+}
+
+app-dashboard {
+  width: 100%;
+  display: block;
 }

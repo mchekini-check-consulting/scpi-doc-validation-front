@@ -1,9 +1,52 @@
-<div class="dashboard-empty">
-  <div class="empty-card">
-    <i class="pi pi-folder-open icon"></i>
-    <h2>Aucun document pour le moment</h2>
-    <p>Commencez par ajouter un nouveau document pour remplir votre espace.</p>
-    <button class="btn-primary" (click)="onCreate()">Créer un document</button>
+<div class="recently-container">
+  <h2 class="title">Suivi des demandes</h2>
+
+  <div class="cards-wrapper">
+    <div *ngFor="let board of displayedBoards; trackBy: trackByTitle" class="monday-card" [ngClass]="board.status"
+      (click)="onCardClick(board)">
+      <div class="status-badge" [ngClass]="board.status"></div>
+
+      <div class="loader-overlay" *ngIf="isLoading">
+        <div class="loader"></div>
+      </div>
+
+      <div class="thumb">
+        <img [src]="board.image" [alt]="board.title" />
+      </div>
+
+      <div class="card-content">
+        <div class="card-header">
+          <div class="left">
+            <i class="pi" [ngClass]="getBoardIcon(board)"></i>
+            <h3 class="card-title">{{ board.title }}</h3>
+          </div>
+
+          <button class="fav-button" (click)="toggleFavorite(board); $event.stopPropagation()">
+            <i class="pi fav-icon" [ngClass]="{
+                'pi-star-fill': board.isFavorite,
+                'pi-star': !board.isFavorite
+              }"></i>
+          </button>
+        </div>
+
+        <div class="counter">{{ board.count }}</div>
+
+        <div class="card-path">
+          <i class="pi pi-user team-icon"></i>
+          <span>{{ board.path }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="legend-bar">
+    <div class="legend pending"></div>
+    En attente
+    <div class="legend processing"></div>
+    En cours
+    <div class="legend rejected"></div>
+    Rejetée
+    <div class="legend valid"></div>
+    Validée
   </div>
 </div>
-

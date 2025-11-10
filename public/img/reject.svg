@@ -1,0 +1,19 @@
+<svg viewBox="0 0 600 260" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="g-reject" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fecaca">
+        <animate attributeName="stop-color" values="#fecaca;#fca5a5;#fecaca" dur="3s" repeatCount="indefinite" />
+      </stop>
+      <stop offset="100%" stop-color="#ef4444">
+        <animate attributeName="stop-color" values="#ef4444;#dc2626;#ef4444" dur="3s" repeatCount="indefinite" />
+      </stop>
+    </linearGradient>
+  </defs>
+  <rect width="600" height="260" rx="24" fill="url(#g-reject)" />
+  <line x1="240" y1="90" x2="360" y2="170" stroke="white" stroke-width="10" stroke-linecap="round">
+    <animate attributeName="stroke-opacity" values="0.4;1;0.4" dur="1.8s" repeatCount="indefinite" />
+  </line>
+  <line x1="360" y1="90" x2="240" y2="170" stroke="white" stroke-width="10" stroke-linecap="round">
+    <animate attributeName="stroke-opacity" values="1;0.4;1" dur="1.8s" repeatCount="indefinite" />
+  </line>
+</svg>
