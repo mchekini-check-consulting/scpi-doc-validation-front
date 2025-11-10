@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -16,19 +17,26 @@ export class LoginComponent {
   error = '';
   isLoading = false;
 
-  constructor(private router: Router) {}
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
 
-  onLogin(): void {
+  async onLogin(): Promise<void> {
     this.error = '';
     this.isLoading = true;
 
-    setTimeout(() => {
+    try {
+      await this.authService.login(this.username, this.password);
+      
+
+      this.router.navigate(['/role-permission']);
+      
+    } catch (err: any) {
+      this.error = err.message || 'Erreur de connexion';
+      console.error('Erreur:', this.error);
+    } finally {
       this.isLoading = false;
-      if (this.username && this.password) {
-        this.router.navigate(['/dashboard']);
-      } else {
-        this.error = 'Identifiants incorrects.';
-      }
-    }, 700);
+    }
   }
 }

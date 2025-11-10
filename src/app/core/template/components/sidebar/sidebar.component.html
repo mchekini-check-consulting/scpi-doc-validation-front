@@ -1,47 +1,160 @@
-<div class="jira-sidebar" [class.collapsed]="isCollapsed">
-  <button class="sidebar-toggle" (click)="toggleSidebar()" title="Réduire / Agrandir">
-    <i [class]="isCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"></i>
+<div 
+  class="fixed left-0 top-0 h-screen bg-white shadow-lg transition-all duration-300 ease-in-out z-50 flex flex-col"
+  [ngClass]="{
+    'w-64': !isCollapsed,
+    'w-16': isCollapsed
+  }"
+>
+  <!-- Toggle Button -->
+  <button 
+    (click)="toggleSidebar()" 
+    class="absolute -right-3 top-6 w-6 h-6 bg-white border-2 border-gray-200 rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors z-10"
+    title="Réduire / Agrandir"
+  >
+    <i 
+      class="text-gray-600 text-xs"
+      [class]="isCollapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"
+    ></i>
   </button>
 
-  <div class="brand-section">
-    <div class="logo-square">
-      <i class="pi pi-chart-bar"></i>
+  <!-- Brand Section -->
+  <div class="flex items-center gap-3 p-4 border-b border-gray-200">
+    <div class="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center flex-shrink-0">
+      <i class="pi pi-chart-bar text-white text-xl"></i>
     </div>
-    <div class="brand-info" *ngIf="!isCollapsed">
-      <span class="brand-name">SCPI INVEST</span>
-      <span class="brand-tagline">Document Manager</span>
+    <div 
+      class="transition-all duration-300 overflow-hidden"
+      [ngClass]="{ 'w-0 opacity-0': isCollapsed, 'w-auto opacity-100': !isCollapsed }"
+    >
+      <div class="flex flex-col">
+        <span class="font-semibold text-base text-gray-800 whitespace-nowrap">SCPI INVEST</span>
+        <span class="text-xs text-gray-500 whitespace-nowrap">Document Manager</span>
+      </div>
     </div>
   </div>
 
-  <nav class="sidebar-nav">
-    <ul class="nav-list">
-      <li *ngFor="let menuItem of menuItems" class="nav-item" [class.active]="isActive(menuItem.path)">
-        <a [routerLink]="[menuItem.path]" class="nav-link">
-          <span class="nav-icon"><i [class]="menuItem.icon"></i></span>
-          <span class="nav-label" *ngIf="!isCollapsed">{{ menuItem.key | translate }}</span>
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto py-4">
+    <ul class="space-y-1 px-2">
+      <li 
+        *ngFor="let menuItem of menuItems" 
+        class="relative"
+      >
+        <a 
+          [routerLink]="[menuItem.path]"
+          [class.bg-blue-50]="isActive(menuItem.path)"
+          [class.text-blue-600]="isActive(menuItem.path)"
+          class="flex items-center gap-3 px-3 py-3 rounded-lg transition-all duration-200 hover:bg-gray-100 text-gray-700 group relative"
+          [ngClass]="{ 'justify-center': isCollapsed }"
+        >
+          <!-- Icon -->
+          <span class="flex-shrink-0 flex items-center justify-center w-5">
+            <i 
+              [class]="menuItem.icon"
+              class="text-xl transition-colors"
+              [class.text-blue-600]="isActive(menuItem.path)"
+            ></i>
+          </span>
+          
+          <!-- Label -->
+          <span 
+            class="font-medium whitespace-nowrap transition-all duration-300 overflow-hidden"
+            [ngClass]="{ 
+              'w-0 opacity-0': isCollapsed, 
+              'w-auto opacity-100': !isCollapsed 
+            }"
+          >
+            {{ menuItem.key | translate }}
+          </span>
+
+          <!-- Tooltip on hover when collapsed -->
+          <div 
+            *ngIf="isCollapsed"
+            class="absolute left-full ml-2 px-3 py-2 bg-gray-900 text-white text-sm rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-200 whitespace-nowrap z-50"
+          >
+            {{ menuItem.key | translate }}
+          </div>
+
+          <!-- Active Indicator -->
+          <div 
+            *ngIf="isActive(menuItem.path)"
+            class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-8 bg-blue-600 rounded-r-full"
+          ></div>
         </a>
       </li>
     </ul>
   </nav>
 
-  <div class="sidebar-footer">
-    <div class="footer-actions" *ngIf="!isCollapsed">
-      <button class="footer-btn" title="Paramètres"><i class="pi pi-cog"></i></button>
-      <button class="footer-btn" title="Aide"><i class="pi pi-question-circle"></i></button>
-      <button class="footer-btn" title="Notifications"><i class="pi pi-bell"></i></button>
+  <!-- Footer -->
+  <div class="border-t border-gray-200 p-4">
+    <!-- Footer Expanded -->
+    <div 
+      *ngIf="!isCollapsed" 
+      class="flex items-center gap-2 justify-center"
+    >
+      <button 
+        class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors"
+        title="Paramètres"
+        (click)="openSettings()"
+      >
+        <i class="pi pi-cog text-lg"></i>
+      </button>
+      <button 
+        class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors"
+        title="Aide"
+        (click)="openHelp()"
+      >
+        <i class="pi pi-question-circle text-lg"></i>
+      </button>
+      <button 
+        class="p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors"
+        title="Notifications"
+        (click)="openNotifications()"
+      >
+        <i class="pi pi-bell text-lg"></i>
+      </button>
     </div>
 
-    <div class="footer-actions" *ngIf="isCollapsed">
-      <div class="dropdown" (click)="$event.stopPropagation()">
-        <button class="footer-btn" (click)="toggleFooterMenu()" title="Plus d’options">
-          <i class="pi pi-ellipsis-h"></i>
-        </button>
+    <!-- Footer Collapsed with Dropdown -->
+    <div 
+      *ngIf="isCollapsed" 
+      class="relative"
+      (click)="$event.stopPropagation()"
+    >
+      <button 
+        class="w-full p-2 rounded-lg hover:bg-gray-100 text-gray-600 hover:text-gray-800 transition-colors flex items-center justify-center"
+        (click)="toggleFooterMenu()"
+        title="Plus d'options"
+      >
+        <i class="pi pi-ellipsis-h text-lg"></i>
+      </button>
 
-        <div class="dropdown-menu" *ngIf="footerMenuOpen">
-          <button (click)="openSettings()"><i class="pi pi-cog"></i> Paramètres</button>
-          <button (click)="openHelp()"><i class="pi pi-question-circle"></i> Aide</button>
-          <button (click)="openNotifications()"><i class="pi pi-bell"></i> Notifications</button>
-        </div>
+      <!-- Dropdown Menu -->
+      <div 
+        *ngIf="footerMenuOpen"
+        class="absolute bottom-full left-full ml-2 mb-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50"
+      >
+        <button 
+          (click)="openSettings()"
+          class="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+        >
+          <i class="pi pi-cog"></i> 
+          <span>Paramètres</span>
+        </button>
+        <button 
+          (click)="openHelp()"
+          class="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+        >
+          <i class="pi pi-question-circle"></i> 
+          <span>Aide</span>
+        </button>
+        <button 
+          (click)="openNotifications()"
+          class="w-full px-4 py-2 text-left hover:bg-gray-50 flex items-center gap-3 text-gray-700 transition-colors"
+        >
+          <i class="pi pi-bell"></i> 
+          <span>Notifications</span>
+        </button>
       </div>
     </div>
   </div>

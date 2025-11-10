@@ -44,32 +44,39 @@
 
   <div class="login-right">
     <div class="login-card">
+    
       <form (ngSubmit)="onLogin()" #f="ngForm">
-        <label>Nom d’utilisateur</label>
-        <input
-          type="text"
-          name="username"
-          [(ngModel)]="username"
-          placeholder="Entrez votre identifiant"
-          required
-        />
+            <label>Nom d’utilisateur</label>
+            <input
+              type="text"
+              name="username"
+              [(ngModel)]="username"
+              placeholder="Entrez votre identifiant"
+              required
+            />
 
-        <label>Mot de passe</label>
-        <input
-          type="password"
-          name="password"
-          [(ngModel)]="password"
-          placeholder="Entrez votre mot de passe"
-          required
-        />
+            <label>Mot de passe</label>
+            <input
+              type="password"
+              name="password"
+              [(ngModel)]="password"
+              placeholder="Entrez votre mot de passe"
+              required
+            />
 
-        <div class="error" *ngIf="error">{{ error }}</div>
+            <!-- Affichage de l'erreur -->
+            <div class="error" *ngIf="error">{{ error }}</div>
 
-        <button class="btn-login" type="submit" [disabled]="isLoading || !f.valid">
-          <span *ngIf="!isLoading">Se connecter</span>
-          <span *ngIf="isLoading">Connexion...</span>
-        </button>
-      </form>
+            <button class="btn-login" type="submit" [disabled]="isLoading || !f.valid">
+              @if (isLoading) {
+                <!-- Icône de chargement -->
+                <span class="spinner"></span>
+                <span>Connexion...</span>
+              } @else {
+                <span>Se connecter</span>
+              }
+            </button>
+          </form>
     </div>
   </div>
 </section>

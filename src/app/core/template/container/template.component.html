@@ -1,10 +1,25 @@
-<div class="app-layout" [class.sidebar-collapsed]="isSidebarCollapsed">
+<div class="flex w-full h-screen overflow-hidden">
+  <!-- Sidebar -->
   <app-sidebar (toggle)="onToggleSidebar($event)"></app-sidebar>
 
-  <div class="main-content">
+  <!-- Main Content -->
+  <div 
+    class="flex flex-col flex-1 transition-all duration-300 ease-in-out"
+    [ngClass]="{
+      'ml-[250px]': !isSidebarCollapsed,
+      'ml-16': isSidebarCollapsed
+    }"
+  >
+    <!-- Navbar -->
     <app-navbar></app-navbar>
 
-    <div class="page-content">
+    <!-- Page Content -->
+    <div 
+      class="flex-1 p-5 md:px-10 bg-gray-50 overflow-y-auto"
+      [ngClass]="{
+        'shadow-[inset_1px_0_0_rgba(0,0,0,0.05)]': !isSidebarCollapsed
+      }"
+    >
       <router-outlet></router-outlet>
     </div>
   </div>

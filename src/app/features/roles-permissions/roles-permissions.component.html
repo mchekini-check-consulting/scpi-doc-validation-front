@@ -1,0 +1,108 @@
+<div class="mt-5">
+
+  <div class="mb-6">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-2">
+      Gestion des Utilisateurs et Rôles
+    </h2>
+    <p class="text-gray-500">
+      Gérez les rôles et permissions des utilisateurs
+    </p>
+  </div>
+
+  <p-toast></p-toast>
+  <p-confirmDialog></p-confirmDialog>
+
+  <p-table 
+    [value]="users" 
+    [loading]="loading"
+    [paginator]="true"
+    [rows]="10"
+    [showCurrentPageReport]="true"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} utilisateurs"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    [globalFilterFields]="['email', 'firstName', 'lastName', 'role']"
+    styleClass="p-datatable-striped"
+    #dt
+  >
+    
+
+
+    <ng-template pTemplate="header">
+      <tr>
+     
+        <th pSortableColumn="email" class="bg-gray-50">
+          <div class="flex items-center gap-2">
+            Email 
+            <p-sortIcon field="email"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="firstName" class="bg-gray-50">
+          <div class="flex items-center gap-2">
+            Prénom 
+            <p-sortIcon field="firstName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="lastName" class="bg-gray-50">
+          <div class="flex items-center gap-2">
+            Nom 
+            <p-sortIcon field="lastName"></p-sortIcon>
+          </div>
+        </th>
+        <th pSortableColumn="role" class="bg-gray-50">
+          <div class="flex items-center gap-2">
+            Rôle 
+            <p-sortIcon field="role"></p-sortIcon>
+          </div>
+        </th>
+       
+        <th class="bg-gray-50">Actions</th>
+      </tr>
+    </ng-template>
+
+    <!-- Corps du tableau -->
+    <ng-template pTemplate="body" let-user>
+      <tr class="hover:bg-gray-50 transition-colors">
+       
+        <td class="text-gray-600">{{ user.email }}</td>
+        <td class="text-gray-600">{{ user.firstName || '-' }}</td>
+        <td class="text-gray-600">{{ user.lastName || '-' }}</td>
+        <td>
+          <p-tag 
+            [value]="getRoleLabel(user.role)" 
+           
+          ></p-tag>
+        </td>
+      
+        <td>
+          <p-dropdown
+            [options]="roleOptions"
+            [(ngModel)]="user.role"
+            (onChange)="onRoleChange(user, $event.value)"
+            placeholder="Changer le rôle"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="p-dropdown-sm"
+          >
+            <ng-template let-option pTemplate="item">
+              <div class="flex items-center gap-2">
+                <p-tag [value]="option.label" [severity]="option.severity"></p-tag>
+              </div>
+            </ng-template>
+          </p-dropdown>
+        </td>
+      </tr>
+    </ng-template>
+
+    <!-- Message si aucune donnée -->
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center">
+          <div class="flex flex-col items-center gap-3 py-12">
+            <i class="pi pi-users text-6xl text-gray-300"></i>
+            <span class="text-gray-400 text-lg">Aucun utilisateur trouvé</span>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
