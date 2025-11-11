@@ -36,6 +36,12 @@ export const ROUTES: RouteInfo[] = [
     key: 'SIDEBAR.DEMAND-HISTORY',
     icon: 'pi pi-list',
   },
+  {
+    path: '/role-permission',
+    title: 'Role & Permissions',
+    key: 'SIDEBAR.ROLE-PERMISSION',
+    icon: 'pi pi-user',
+  },
 ];
 
 @Component({

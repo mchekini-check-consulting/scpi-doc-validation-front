@@ -6,6 +6,8 @@ import { TaskComponent } from './features/task/task.component';
 
 import { LandingComponent } from './features/landing/landing.component';
 import { LoginComponent } from './features/login/login.component';
+import { RolesPermissionsComponent } from './features/roles-permissions/roles-permissions.component';
+import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
@@ -19,6 +21,11 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'demand-history', component: DemandHistoryComponent },
       { path: 'tasks', component: TaskComponent },
+      {
+        path: 'role-permission',
+        component: RolesPermissionsComponent,
+        canActivate: [authGuard],
+      },
     ],
   },
 

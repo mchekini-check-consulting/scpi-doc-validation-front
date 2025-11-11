@@ -2,6 +2,7 @@
   "SIDEBAR": {
     "DASHBOARD": "Dashboard",
     "DEMAND-HISTORY": "Demand History",
-    "TASKS": "Tasks Board"
+    "TASKS": "Tasks Board",
+    "ROLE-PERMISSION": "User Management"
   }
 }
