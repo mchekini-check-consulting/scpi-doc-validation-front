@@ -1,99 +1,144 @@
-<p>roles-permissions works!</p>
-<div class="mt-5">
-  <div class="mb-6">
-    <h2 class="text-2xl font-semibold text-gray-800 mb-2">
-      Gestion des Utilisateurs et Rôles
-    </h2>
-    <p class="text-gray-500">Gérez les rôles et permissions des utilisateurs</p>
+<div class="mt-10 p-10">
+ <div class="mb-6">
+  <div class="header-container">
+    <div>
+      <h2>Gestion des Permissions</h2>
+      <p class="text-gray-500">
+        Gérez les permissions pour les rôles Standard et Premium
+      </p>
+    </div>
+
+    <div>
+      <p-button
+        label="Nouvelle Permission"
+        icon="pi pi-plus"
+        (onClick)="openCreateDialog()"
+      
+      ></p-button>
+    </div>
   </div>
+</div>
 
   <p-toast></p-toast>
-  <p-confirmDialog></p-confirmDialog>
 
   <p-table
-    [value]="users"
+    [value]="permissions"
     [loading]="loading"
     [paginator]="true"
     [rows]="10"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} utilisateurs"
+    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} permissions"
     [rowsPerPageOptions]="[10, 25, 50]"
-    [globalFilterFields]="['email', 'firstName', 'lastName', 'role']"
+    [globalFilterFields]="['permissionName', 'description']"
     styleClass="p-datatable-striped"
     #dt
   >
     <ng-template pTemplate="header">
       <tr>
-        <th pSortableColumn="email" class="bg-gray-50">
+        <th pSortableColumn="permissionName" class="bg-gray-50">
           <div class="flex items-center gap-2">
-            Email
-            <p-sortIcon field="email"></p-sortIcon>
+            Fonctionnalité
+            <p-sortIcon field="permissionName"></p-sortIcon>
           </div>
         </th>
-        <th pSortableColumn="firstName" class="bg-gray-50">
+        <th pSortableColumn="description" class="bg-gray-50">
           <div class="flex items-center gap-2">
-            Prénom
-            <p-sortIcon field="firstName"></p-sortIcon>
+            Description
+            <p-sortIcon field="description"></p-sortIcon>
           </div>
         </th>
-        <th pSortableColumn="lastName" class="bg-gray-50">
-          <div class="flex items-center gap-2">
-            Nom
-            <p-sortIcon field="lastName"></p-sortIcon>
-          </div>
-        </th>
-        <th pSortableColumn="role" class="bg-gray-50">
-          <div class="flex items-center gap-2">
-            Rôle
-            <p-sortIcon field="role"></p-sortIcon>
-          </div>
-        </th>
-
-        <th class="bg-gray-50">Actions</th>
+        <th class="bg-gray-50 text-center">Rôle Standard</th>
+        <th class="bg-gray-50 text-center">Rôle Premium</th>
       </tr>
     </ng-template>
 
-    <ng-template pTemplate="body" let-user>
+    <ng-template pTemplate="body" let-permission>
       <tr class="hover:bg-gray-50 transition-colors">
-        <td class="text-gray-600">{{ user.email }}</td>
-        <td class="text-gray-600">{{ user.firstName || "-" }}</td>
-        <td class="text-gray-600">{{ user.lastName || "-" }}</td>
-        <td>
-          <p-tag [value]="getRoleLabel(user.role)"></p-tag>
+        <td class="font-semibold text-gray-700">
+          {{ permission.permissionName }}
         </td>
-
-        <td>
-          <p-dropdown
-            [options]="roleOptions"
-            [(ngModel)]="user.role"
-            (onChange)="onRoleChange(user, $event.value)"
-            placeholder="Changer le rôle"
-            optionLabel="label"
-            optionValue="value"
-            styleClass="p-dropdown-sm"
-          >
-            <ng-template let-option pTemplate="item">
-              <div class="flex items-center gap-2">
-                <p-tag
-                  [value]="option.label"
-                  [severity]="option.severity"
-                ></p-tag>
-              </div>
-            </ng-template>
-          </p-dropdown>
+        <td class="text-gray-600">
+          {{ permission.description || "-" }}
+        </td>
+        <td class="text-center">
+          <p-checkbox
+            [(ngModel)]="permission.assignedToStandard"
+            [binary]="true"
+            (onChange)="onStandardChange(permission, $event.checked)"
+            inputId="standard-{{ permission.permissionName }}"
+          ></p-checkbox>
+        </td>
+        <td class="text-center">
+          <p-checkbox
+            [(ngModel)]="permission.assignedToPremium"
+            [binary]="true"
+            (onChange)="onPremiumChange(permission, $event.checked)"
+            inputId="premium-{{ permission.permissionName }}"
+          ></p-checkbox>
         </td>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center">
+        <td colspan="4" class="text-center">
           <div class="flex flex-col items-center gap-3 py-12">
-            <i class="pi pi-users text-6xl text-gray-300"></i>
-            <span class="text-gray-400 text-lg">Aucun utilisateur trouvé</span>
+            <i class="pi pi-lock text-6xl text-gray-300"></i>
+            <span class="text-gray-400 text-lg">Aucune permission trouvée</span>
           </div>
         </td>
       </tr>
     </ng-template>
   </p-table>
 </div>
+
+<p-dialog
+  header="Créer une nouvelle permission"
+  [(visible)]="displayDialog"
+  [modal]="true"
+  [style]="{ width: '450px' }"
+  [draggable]="false"
+  [resizable]="false"
+>
+  <div class="flex flex-col gap-4">
+    <div class="flex flex-col gap-2">
+      <label for="permissionName" class="font-semibold text-gray-700">
+        Nom de la permission <span class="text-red-500">*</span>
+      </label>
+      <input
+        pInputText
+        id="permissionName"
+        [(ngModel)]="newPermission.permissionName"
+        placeholder="Ex: VIEW_ANALYTICS"
+        class="w-full"
+      />
+      <small class="text-gray-500">
+        Utilisez le format UPPER_CASE avec underscore
+      </small>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label for="description" class="font-semibold text-gray-700">
+        Description
+      </label>
+      <textarea
+        pTextarea
+        id="description"
+        [(ngModel)]="newPermission.description"
+        placeholder="Description de la permission"
+        [rows]="3"
+        class="w-full"
+      ></textarea>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+  
+    <p-button
+      label="Créer"
+      icon="pi pi-check"
+      (onClick)="savePermission()"
+     
+    ></p-button>
+  </ng-template>
+</p-dialog>

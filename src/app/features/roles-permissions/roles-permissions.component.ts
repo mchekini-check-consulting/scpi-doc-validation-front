@@ -2,21 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { DropdownModule } from 'primeng/dropdown';
+import { CheckboxModule } from 'primeng/checkbox';
 import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { MessageService, ConfirmationService } from 'primeng/api';
+import { DialogModule } from 'primeng/dialog';
+import { TextareaModule } from 'primeng/textarea';
+import { InputTextModule } from 'primeng/inputtext';
+
+import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import {
-  User,
-  UserManagementService,
-} from '../../core/service/user-management.service';
-
-interface RoleOption {
-  label: string;
-  value: string;
-}
+  CreatePermissionRequest,
+  PermissionResponse,
+  RolePermissionService,
+} from '../../core/service/role-permissions.service';
 
 @Component({
   selector: 'app-roles-permissions',
@@ -26,97 +24,195 @@ interface RoleOption {
     FormsModule,
     TableModule,
     ButtonModule,
-    TagModule,
-    DropdownModule,
+    CheckboxModule,
     ToastModule,
-    ConfirmDialogModule,
+    DialogModule,
+    TextareaModule,
+    InputTextModule
   ],
   templateUrl: './roles-permissions.component.html',
   styleUrl: './roles-permissions.component.scss',
-  providers: [MessageService, ConfirmationService],
+  providers: [MessageService],
 })
 export class RolesPermissionsComponent implements OnInit {
-  users: User[] = [];
+  permissions: PermissionResponse[] = [];
   loading: boolean = false;
 
-  roleOptions: RoleOption[] = [
-    { label: 'Standard', value: 'standard' },
-    { label: 'Premium', value: 'premium' },
-    { label: 'Admin', value: 'admin' },
-  ];
+  displayDialog: boolean = false;
+  newPermission: CreatePermissionRequest = {
+    permissionName: '',
+    description: '',
+  };
 
   constructor(
-    private userService: UserManagementService,
-    private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private permissionService: RolePermissionService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
-    this.loadUsers();
+    this.loadPermissions();
   }
 
-  loadUsers() {
+  loadPermissions() {
     this.loading = true;
-    this.userService.getAllUsers().subscribe({
+    this.permissionService.getAllPermissions().subscribe({
       next: (data) => {
-        this.users = data;
+        this.permissions = data;
         this.loading = false;
       },
       error: (error) => {
-        console.error('Erreur lors du chargement des utilisateurs', error);
+        console.error('Erreur lors du chargement des permissions', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
-          detail: 'Impossible de charger les utilisateurs',
+          detail: 'Impossible de charger les permissions',
         });
         this.loading = false;
       },
     });
   }
 
-  onRoleChange(user: User, newRole: string) {
-    this.confirmationService.confirm({
-      message: `Êtes-vous sûr de vouloir changer le rôle de ${user.firstName} en ${newRole} ?`,
-      header: 'Confirmation',
-      icon: 'pi pi-exclamation-triangle',
-      accept: () => {
-        this.updateUserRole(user.id, newRole);
-      },
-      reject: () => {
-        this.loadUsers();
-      },
-    });
+  // Gère le changement de checkbox pour Standard
+  onStandardChange(permission: PermissionResponse, checked: boolean) {
+    const request = {
+      permissionName: permission.permissionName,
+      roleName: 'standard',
+    };
+
+    if (checked) {
+      // Assigner la permission
+      this.permissionService.assignPermissionToRole(request).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Permission assignée au rôle Standard',
+          });
+          this.loadPermissions();
+        },
+        error: (error) => {
+          console.error('Erreur', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: "Impossible d'assigner la permission",
+          });
+          this.loadPermissions();
+        },
+      });
+    } else {
+      // Retirer la permission
+      this.permissionService.removePermissionFromRole(request).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Permission retirée du rôle Standard',
+          });
+          this.loadPermissions();
+        },
+        error: (error) => {
+          console.error('Erreur', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: 'Impossible de retirer la permission',
+          });
+          this.loadPermissions();
+        },
+      });
+    }
   }
 
-  updateUserRole(userId: string, role: string) {
-    this.userService.updateUserRole(userId, role).subscribe({
+  onPremiumChange(permission: PermissionResponse, checked: boolean) {
+    const request = {
+      permissionName: permission.permissionName,
+      roleName: 'premium',
+    };
+
+    if (checked) {
+      this.permissionService.assignPermissionToRole(request).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Permission assignée au rôle Premium',
+          });
+          this.loadPermissions();
+        },
+        error: (error) => {
+          console.error('Erreur', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: "Impossible d'assigner la permission",
+          });
+          this.loadPermissions();
+        },
+      });
+    } else {
+      this.permissionService.removePermissionFromRole(request).subscribe({
+        next: () => {
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Succès',
+            detail: 'Permission retirée du rôle Premium',
+          });
+          this.loadPermissions();
+        },
+        error: (error) => {
+          console.error('Erreur', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Erreur',
+            detail: 'Impossible de retirer la permission',
+          });
+          this.loadPermissions();
+        },
+      });
+    }
+  }
+
+  openCreateDialog() {
+    this.displayDialog = true;
+    this.newPermission = {
+      permissionName: '',
+      description: '',
+    };
+  }
+
+  savePermission() {
+    if (!this.newPermission.permissionName.trim()) {
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Attention',
+        detail: 'Le nom de la permission est obligatoire',
+      });
+      return;
+    }
+
+    this.permissionService.createPermission(this.newPermission).subscribe({
       next: () => {
         this.messageService.add({
           severity: 'success',
           summary: 'Succès',
-          detail: 'Rôle mis à jour avec succès',
+          detail: 'Permission créée avec succès',
         });
-        this.loadUsers();
+        this.displayDialog = false;
+        this.loadPermissions();
       },
       error: (error) => {
-        console.error('Erreur lors de la mise à jour du rôle', error);
+        console.error('Erreur', error);
         this.messageService.add({
           severity: 'error',
           summary: 'Erreur',
-          detail: 'Impossible de mettre à jour le rôle',
+          detail: 'Impossible de créer la permission',
         });
-        this.loadUsers();
       },
     });
   }
 
-  getRoleLabel(role: string): string {
-    const roleLabels: { [key: string]: string } = {
-      admin: 'Admin',
-      premium: 'Premium',
-      standard: 'Standard',
-      none: 'Aucun',
-    };
-    return roleLabels[role?.toLowerCase()] || role;
+  closeDialog() {
+    this.displayDialog = false;
   }
 }
