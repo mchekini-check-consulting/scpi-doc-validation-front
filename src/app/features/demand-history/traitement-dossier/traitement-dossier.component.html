@@ -1,0 +1,79 @@
+<section class="traitement-container">
+  <div class="traitement-shell">
+    <header class="traitement-header">
+      <div class="header-text">
+        <h1 class="title">Traitement du dossier</h1>
+        <p class="subtitle">
+          Validez ou rejetez les documents envoyés par le client.
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button class="btn-retour" (click)="goBack()">
+          <i class="pi pi-arrow-left"></i>
+          Retour
+        </button>
+
+        <button class="btn-reject" (click)="rejectDocument()">
+          <i class="pi pi-times"></i>
+          Rejeter
+        </button>
+
+        <button class="btn-validate" (click)="validateDocument()">
+          <i class="pi pi-check"></i>
+          Accepter
+        </button>
+      </div>
+    </header>
+
+    <div class="preview-card" *ngIf="currentDocument as doc">
+      <div class="preview-header">
+        <h2>{{ doc.typeLabel }}</h2>
+
+        <div class="nav-buttons">
+          <button
+            class="nav-btn"
+            (click)="prevDocument()"
+            [disabled]="currentIndex === 0"
+          >
+            <i class="pi pi-chevron-left"></i>
+          </button>
+
+          <span class="count">
+            {{ currentIndex + 1 }} / {{ documents.length }}
+          </span>
+
+          <button
+            class="nav-btn"
+            (click)="nextDocument()"
+            [disabled]="currentIndex === documents.length - 1"
+          >
+            <i class="pi pi-chevron-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-content">
+        <img
+          *ngIf="isImage(doc.fileName)"
+          [src]="docUrl(doc)"
+          class="preview-img"
+        />
+
+        <iframe
+          *ngIf="isPdf(doc.fileName)"
+          [src]="docUrl(doc)"
+          class="preview-pdf">
+        </iframe>
+      </div>
+
+      <div *ngIf="showValidationAnim" class="validation-anim success">
+        <i class="pi pi-check-circle"></i>
+      </div>
+
+      <div *ngIf="showRejectAnim" class="validation-anim reject">
+        <i class="pi pi-times-circle"></i>
+      </div>
+    </div>
+  </div>
+</section>

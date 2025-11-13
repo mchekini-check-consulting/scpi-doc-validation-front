@@ -1,20 +1,21 @@
 <section class="demand-history-section">
+  <!-- <header class="section-header">
+    <h1 class="section-title">Historique des demandes</h1>
+    <p class="section-subtitle">
+      Retrouvez ici tous les dossiers clients et accédez au traitement détaillé
+      de chaque demande.
+    </p>
+  </header> -->
+
   <div class="demand-history-wrapper">
     <div class="table-card">
       <div class="table-header-inline">
-        <h2 class="title">Demand History</h2>
-        <div class="inline-actions">
-          <button class="btn-primary">
-            <i class="pi pi-plus"></i>
-            New Task
-          </button>
-          <button class="btn-ghost">
-            <i class="pi pi-filter"></i>
-          </button>
-          <button class="btn-ghost">
-            <i class="pi pi-sort-alt"></i>
-          </button>
-        </div>
+        <!-- <div>
+          <h2 class="table-header-title">Suivi des dossiers clients</h2>
+          <p class="table-header-description">
+            Vue consolidée du statut des dossiers et des documents transmis.
+          </p>
+        </div> -->
       </div>
 
       <div class="table-scroll-wrapper">
@@ -33,9 +34,10 @@
                 </div>
               </th>
               <th>Client</th>
-              <th>Dossier status</th>
+              <th>Statut du dossier</th>
               <th>Documents</th>
-              <th>Last update</th>
+              <th>Modifier à</th>
+              <th class="col-action">Action</th>
             </tr>
           </ng-template>
 
@@ -92,19 +94,30 @@
               <td class="col-date">
                 {{ dossier.lastUpdatedAt }}
               </td>
+
+              <td class="col-action">
+                <button
+                  type="button"
+                  class="action-button"
+                  (click)="onTreatDossier(dossier)"
+                >
+                  <i class="pi pi-play-circle"></i>
+                  Traiter le dossier
+                </button>
+              </td>
             </tr>
 
             <tr *ngIf="isExpanded(dossier)" class="subitems-row">
-              <td colspan="6" class="subitems-container">
+              <td colspan="7" class="subitems-container">
                 <div class="subitems-wrapper">
                   <table class="sub-table">
                     <thead>
                       <tr>
-                        <th>Type</th>
-                        <th>Fichier</th>
-                        <th>Status</th>
-                        <th>Uploaded</th>
-                        <th>Last update</th>
+                        <th>Type de document</th>
+                        <th>Nom du fichier</th>
+                        <th>Statut</th>
+                        <th>Téléversé le</th>
+                        <th>Dernière mise à jour</th>
                       </tr>
                     </thead>
                     <tbody>

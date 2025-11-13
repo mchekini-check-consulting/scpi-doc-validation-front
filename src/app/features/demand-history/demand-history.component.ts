@@ -4,6 +4,8 @@ import { TableModule } from 'primeng/table';
 import { FormsModule } from '@angular/forms';
 import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
+import { Router } from '@angular/router';
+
 import {
   DossierRow,
   DocumentSubRow,
@@ -30,7 +32,8 @@ export class DemandHistoryComponent implements OnInit {
 
   constructor(
     private documentService: DocumentService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -52,7 +55,7 @@ export class DemandHistoryComponent implements OnInit {
         });
       },
       error: (err) => {
-        console.error(' Erreur lors du chargement des documents:', err);
+        console.error('Erreur lors du chargement des documents:', err);
         this.isLoading = false;
 
         this.messageService.add({
@@ -218,4 +221,11 @@ export class DemandHistoryComponent implements OnInit {
           .toUpperCase()
       : '';
   }
+
+  onTreatDossier(dossier: DossierRow): void {
+   this.router.navigate(['/demand-history', 'traitement', dossier.userEmail], {
+  state: { documents: dossier.documents },
+});
+  }
 }
+

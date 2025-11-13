@@ -234,3 +234,17 @@ app-dashboard {
   width: 100%;
   display: block;
 }
+.main-content {
+  position: relative;
+  margin-left: var(--sidebar-width);
+  margin-top: var(--navbar-height);
+  padding: 24px 32px;
+  height: calc(100vh - var(--navbar-height));
+  overflow-y: auto;
+  background: var(--bg-light);
+  transition: margin-left var(--transition);
+}
+
+.sidebar-collapsed .main-content {
+  margin-left: var(--sidebar-collapsed-width);
+}
