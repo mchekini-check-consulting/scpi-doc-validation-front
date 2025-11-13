@@ -5,9 +5,11 @@ import { Router } from '@angular/router';
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private TOKEN_KEY = 'access_token';
-  private AUTH_URL = 'https://keycloak.check-consulting.net/realms/scpi-realm/protocol/openid-connect';
 
-  private CLIENT_ID = 'scpi-doc-validation-front'; 
+  private AUTH_URL =
+    'https://keycloak.check-consulting.net/realms/doc-validation/protocol/openid-connect';
+
+  private CLIENT_ID = 'scpi-doc-validation-front';
   private REQUIRED_ROLE = 'validator';
 
   constructor(private http: HttpClient, private router: Router) {}
@@ -19,14 +21,19 @@ export class AuthService {
     body.set('username', username);
     body.set('password', password);
 
-    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded',
+    });
 
     try {
       const tokenRes: any = await this.http
         .post(`${this.AUTH_URL}/token`, body.toString(), { headers })
         .toPromise();
 
-      if (!tokenRes?.access_token) return false;
+      if (!tokenRes?.access_token) {
+        console.error('No access_token in token response', tokenRes);
+        return false;
+      }
 
       const token = tokenRes.access_token;
 
@@ -34,18 +41,26 @@ export class AuthService {
 
       const roles: string[] = [
         ...(payload.realm_access?.roles || []),
-        ...(payload.resource_access?.['scpi-doc-validation-front']?.roles || [])
+        ...(payload.resource_access?.[this.CLIENT_ID]?.roles || []),
       ];
 
-      if (!roles.includes(this.REQUIRED_ROLE)) {
+      console.log('User roles from token:', roles);
+
+      if (this.REQUIRED_ROLE && !roles.includes(this.REQUIRED_ROLE)) {
+        console.error('User missing required role', this.REQUIRED_ROLE);
         throw new Error('NOT_VALIDATOR');
       }
 
       localStorage.setItem(this.TOKEN_KEY, token);
 
       return true;
-    } catch (e) {
-      console.error('LOGIN ERROR', e);
+    } catch (e: any) {
+      console.error('LOGIN ERROR', e?.error || e);
+
+      if (e?.error?.error_description) {
+        alert('Keycloak: ' + e.error.error_description);
+      }
+
       throw e;
     }
   }
