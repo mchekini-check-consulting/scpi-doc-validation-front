@@ -8,7 +8,7 @@ import { Router } from '@angular/router';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  styleUrls: ['./login.component.css'],
 })
 export class LoginComponent {
   username = '';
@@ -25,7 +25,7 @@ export class LoginComponent {
     setTimeout(() => {
       this.isLoading = false;
       if (this.username && this.password) {
-        this.router.navigate(['/dashboard']);
+        this.router.navigate(['/splash']);
       } else {
         this.error = 'Identifiants incorrects.';
       }

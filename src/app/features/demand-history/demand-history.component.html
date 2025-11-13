@@ -1,13 +1,139 @@
-<div class="empty-card purple">
-  <div class="icon-wrapper">
-    <i class="pi pi-history"></i>
+<section class="demand-history-section">
+  <div class="demand-history-wrapper">
+    <div class="table-card">
+      <div class="table-header-inline">
+        <h2 class="title">Demand History</h2>
+        <div class="inline-actions">
+          <button class="btn-primary">
+            <i class="pi pi-plus"></i>
+            New Task
+          </button>
+          <button class="btn-ghost">
+            <i class="pi pi-filter"></i>
+          </button>
+          <button class="btn-ghost">
+            <i class="pi pi-sort-alt"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="table-scroll-wrapper">
+        <p-table [value]="dossiers" class="monday-table">
+          <ng-template pTemplate="header">
+            <tr>
+              <th class="col-expander"></th>
+              <th class="col-checkbox">
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    class="custom-checkbox"
+                    [checked]="areAllSelected()"
+                    (change)="toggleSelectAll($event)"
+                  />
+                </div>
+              </th>
+              <th>Client</th>
+              <th>Dossier status</th>
+              <th>Documents</th>
+              <th>Last update</th>
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-dossier>
+            <tr
+              class="main-row"
+              [ngClass]="{ 'is-expanded': isExpanded(dossier) }"
+            >
+              <td class="col-expander">
+                <button
+                  type="button"
+                  class="expander-btn"
+                  [ngClass]="{ 'is-open': isExpanded(dossier) }"
+                  (click)="toggleExpand(dossier)"
+                >
+                  <i class="pi pi-chevron-right"></i>
+                </button>
+              </td>
+
+              <td class="col-checkbox">
+                <div class="checkbox-wrapper">
+                  <input
+                    type="checkbox"
+                    class="custom-checkbox"
+                    [(ngModel)]="dossier.selected"
+                  />
+                </div>
+              </td>
+
+              <td class="col-client">
+                <div class="owner-cell">
+                  <div class="owner-avatar">
+                    {{ getInitials(dossier.fullName) }}
+                  </div>
+                  <span class="owner-name">
+                    {{ dossier.fullName }}
+                  </span>
+                </div>
+              </td>
+
+              <td class="col-status">
+                <div
+                  class="status-pill"
+                  [ngClass]="'status-' + dossier.statusKey"
+                >
+                  {{ dossier.statusLabel }}
+                </div>
+              </td>
+
+              <td class="col-docs">
+                {{ dossier.docsSummary }}
+              </td>
+
+              <td class="col-date">
+                {{ dossier.lastUpdatedAt }}
+              </td>
+            </tr>
+
+            <tr *ngIf="isExpanded(dossier)" class="subitems-row">
+              <td colspan="6" class="subitems-container">
+                <div class="subitems-wrapper">
+                  <table class="sub-table">
+                    <thead>
+                      <tr>
+                        <th>Type</th>
+                        <th>Fichier</th>
+                        <th>Status</th>
+                        <th>Uploaded</th>
+                        <th>Last update</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr *ngFor="let doc of dossier.documents">
+                        <td>
+                          <span class="type-chip">
+                            {{ doc.typeLabel }}
+                          </span>
+                        </td>
+                        <td>{{ doc.fileName }}</td>
+                        <td>
+                          <div
+                            class="status-pill sm"
+                            [ngClass]="'status-' + doc.statusKey"
+                          >
+                            {{ doc.statusLabel }}
+                          </div>
+                        </td>
+                        <td>{{ doc.uploadedAt }}</td>
+                        <td>{{ doc.lastUpdatedAt }}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
   </div>
-
-  <h2>Historique des demandes</h2>
-  <p>
-    Aucune demande enregistrée pour le moment. Consultez vos activités récentes ici.
-  </p>
-
-  <button class="btn">Voir les demandes</button>
-</div>
-
+</section>

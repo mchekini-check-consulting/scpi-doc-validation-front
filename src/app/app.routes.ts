@@ -7,12 +7,14 @@ import { TaskComponent } from './features/task/task.component';
 import { LandingComponent } from './features/landing/landing.component';
 import { LoginComponent } from './features/login/login.component';
 import { RolesPermissionsComponent } from './features/roles-permissions/roles-permissions.component';
+import { SplashScreenComponent } from './core/template/components/splash-screen/splash-screen/splash-screen.component';
 import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'landing', pathMatch: 'full' },
   { path: 'landing', component: LandingComponent },
   { path: 'login', component: LoginComponent },
+  { path: 'splash', component: SplashScreenComponent },
 
   {
     path: '',
