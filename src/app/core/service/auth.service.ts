@@ -1,5 +1,18 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
+
+interface DecodedToken {
+  resource_access?: {
+    'scpi-invest-front'?: {
+      roles?: string[];
+    };
+  };
+  exp?: number;
+  sub?: string;
+  preferred_username?: string;
+  email?: string;
+  name?: string;
+}
 
 const TOKEN_ENDPOINT = 'https://keycloak.check-consulting.net/realms/scpi-realm/protocol/openid-connect/token';
 const CLIENT_ID = 'scpi-invest-front';
@@ -8,9 +21,54 @@ const CLIENT_ID = 'scpi-invest-front';
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly TOKEN_KEY = 'access_token';
+  
+  constructor() {}
 
-  constructor(private router: Router) {}
+
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
+
+  setToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
+
+
+  removeToken(): void {
+    localStorage.removeItem('token');
+  }
+
+
+  hasRole(role: string): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      const roles = decoded.resource_access?.['scpi-invest-front']?.roles || [];
+      return roles.includes(role);
+    } catch (error) {
+      console.error('Erreur de décodage du token:', error);
+      return false;
+    }
+  }
+
+  isAdmin(): boolean {
+    return this.hasRole('admin');
+  }
+
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decoded.exp ? decoded.exp > currentTime : false;
+    } catch (error) {
+      return false;
+    }
+  }
 
   async login(username: string, password: string): Promise<boolean> {
     const formData = new URLSearchParams();
@@ -18,7 +76,7 @@ export class AuthService {
     formData.append('client_id', CLIENT_ID);
     formData.append('username', username);
     formData.append('password', password);
-
+    
     try {
       const response = await fetch(TOKEN_ENDPOINT, {
         method: 'POST',
@@ -27,11 +85,10 @@ export class AuthService {
         },
         body: formData.toString()
       });
-
+      
       const data = await response.json();
-
+      
       if (response.ok) {
-     
         this.setToken(data.access_token);
         return true;
       } else {
@@ -43,20 +100,8 @@ export class AuthService {
     }
   }
 
-  setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
-  }
-
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  isAuthenticated(): boolean {
-    return this.getToken() !== null;
-  }
 
   logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    this.router.navigate(['/login']);
+    this.removeToken();
   }
 }

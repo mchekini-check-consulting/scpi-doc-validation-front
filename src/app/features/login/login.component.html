@@ -11,7 +11,8 @@
     <h2 class="headline">Gestion documentaire simplifiée</h2>
     <p class="description">
       Gérez vos documents en toute simplicité avec notre plateforme intuitive.
-      Stockez, validez et suivez vos données d’investissement en un seul endroit.
+      Stockez, validez et suivez vos données d’investissement en un seul
+      endroit.
     </p>
 
     <div class="progress-animation">
@@ -36,14 +37,18 @@
     </div>
 
     <footer class="footer">
-      <a href="#">Documentation</a> •
-      <a href="#">Support</a> •
+      <a href="#">Documentation</a> • <a href="#">Support</a> •
       <a href="#">Téléchargement</a>
     </footer>
   </div>
 
   <div class="login-right">
     <div class="login-card">
+      <div class="error-toast" *ngIf="error">
+        <i class="pi pi-exclamation-triangle"></i>
+        <span>{{ error }}</span>
+      </div>
+
       <form (ngSubmit)="onLogin()" #f="ngForm">
         <label>Nom d’utilisateur</label>
         <input
@@ -65,7 +70,11 @@
 
         <div class="error" *ngIf="error">{{ error }}</div>
 
-        <button class="btn-login" type="submit" [disabled]="isLoading || !f.valid">
+        <button
+          class="btn-login"
+          type="submit"
+          [disabled]="isLoading || !f.valid"
+        >
           <span *ngIf="!isLoading">Se connecter</span>
           <span *ngIf="isLoading">Connexion...</span>
         </button>

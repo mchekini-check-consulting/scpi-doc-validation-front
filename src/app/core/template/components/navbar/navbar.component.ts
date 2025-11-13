@@ -105,7 +105,7 @@ export class NavbarComponent {
   }
 
   logout() {
-    localStorage.removeItem('token');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('user');
     this.closeAll();
     this.router.navigate(['/landing']);

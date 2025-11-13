@@ -1,0 +1,114 @@
+[33mcommit 816da6d4a737331593ba9ebf9b5f8bf51e3e16da[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Tue Nov 11 21:05:14 2025 +0100
+
+    (bugfix):fix conflect taiwlind saidbar css
+
+[33mcommit 68bfcc3be9aa027b81d66699436d39cd9260530e[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Mon Nov 10 06:15:53 2025 +0100
+
+    add dashboard design
+
+[33mcommit cded89d87494ade6215cdaeb2182cef6e6ba0aa7[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 05:21:18 2025 +0100
+
+    fix chart helm
+
+[33mcommit 13e7f23559d95252d550032221cd07e15595ba28[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 05:17:49 2025 +0100
+
+    fix chart helm
+
+[33mcommit 4ad12a06319d828cb8064ea2edd597a5e1125023[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 04:58:17 2025 +0100
+
+    fix relaod and NGINX
+
+[33mcommit 80488d5e45fcaa68b2b62dd7ad217416f4c798de[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 04:50:19 2025 +0100
+
+    fix NgInx
+
+[33mcommit 9792362412bb3e23e484cb7eb7267a4858a37073[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 04:23:16 2025 +0100
+
+    wip
+
+[33mcommit 3fef5055aca46c4d0517129f0c1b027f4d54255d[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 04:02:42 2025 +0100
+
+    Fix chart helm
+
+[33mcommit 1c9b005b4ed37bf6a5d16440d7aadf32560c85fe[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 04:00:55 2025 +0100
+
+    fix chart helm
+
+[33mcommit 831759d2978738be6b3ddf4818b5baf3c9ead63f[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Nov 2 03:48:55 2025 +0100
+
+    wip
+
+[33mcommit 55f52634efd4899a00c4dabc977b3460a35570ca[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sat Nov 1 23:50:46 2025 +0100
+
+    Documents Manager Template
+
+[33mcommit 16b98d933c7076a5edfbea36fbb8e03aaa125fd4[m
+Author: mchekini <me.chekini@gmail.com>
+Date:   Tue Oct 21 17:42:23 2025 +0200
+
+    Init front end project
+
+[33mcommit 0eddfe996ef0306b866bc5c66d160c4a00bb3d4c[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Oct 19 23:01:26 2025 +0200
+
+    template front
+
+[33mcommit 4149d83f84a2d555cd116590814026c3dc1a3fb7[m
+Author: Meziani Belkacem <meziani.belkacem@corepulse.fr>
+Date:   Sun Oct 19 22:08:51 2025 +0200
+
+    add environements folder
+
+[33mcommit 9f76efcbb88cfe9c46c9cef960407c2c47b26f93[m
+Merge: 31b482a 14cbc5d
+Author: Meziani Belkacem <meziani.belkacem@corepulse.fr>
+Date:   Sun Oct 19 14:56:28 2025 +0200
+
+    inital project angular scpi-invest
+
+[33mcommit 31b482a21ad488cbf7e55c5e6e543c9848424e9c[m
+Author: nasseraitahmed07 <aitahmednasser@outlook.com>
+Date:   Sun Oct 19 02:21:25 2025 +0200
+
+    Remove .vscode from tracking
+
+[33mcommit f82830fdd7ffc899906e088737a944dd3fe57dfd[m
+Author: nasseraitahmed07469 <salimnasserait@gmail.com>
+Date:   Sun Oct 19 00:54:13 2025 +0200
+
+    add chart helm configuration
+
+[33mcommit 384634a5bfcde87c1eb4f71b8dcfb39aad410dbd[m
+Author: nasseraitahmed07469 <salimnasserait@gmail.com>
+Date:   Sat Oct 18 23:26:43 2025 +0200
+
+    init angular project
+
+[33mcommit 14cbc5d031a496cec403a7dafbd0833cd3ffeab5[m
+Author: Meziani Belkacem <meziani.belkacem@corepulse.fr>
+Date:   Sat Oct 18 20:43:07 2025 +0200
+
+    initial project

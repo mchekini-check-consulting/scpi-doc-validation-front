@@ -1,0 +1,29 @@
+<!-- assets/loader-docmanager.svg -->
+<svg viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+  <rect width="100%" height="100%" fill="#ffffff" />
+
+  <!-- Pastille rouge -->
+  <circle cx="60" cy="50" r="10" fill="#ea4335">
+    <animate attributeName="cy" values="50;40;50" dur="0.8s" repeatCount="indefinite" begin="0s" />
+    <animate attributeName="opacity" values="1;0.6;1" dur="0.8s" repeatCount="indefinite" begin="0s" />
+  </circle>
+
+  <!-- Pastille jaune -->
+  <circle cx="100" cy="50" r="10" fill="#fbbc05">
+    <animate attributeName="cy" values="50;40;50" dur="0.8s" repeatCount="indefinite" begin="0.2s" />
+    <animate attributeName="opacity" values="1;0.6;1" dur="0.8s" repeatCount="indefinite" begin="0.2s" />
+  </circle>
+
+  <!-- Pastille verte -->
+  <circle cx="140" cy="50" r="10" fill="#34a853">
+    <animate attributeName="cy" values="50;40;50" dur="0.8s" repeatCount="indefinite" begin="0.4s" />
+    <animate attributeName="opacity" values="1;0.6;1" dur="0.8s" repeatCount="indefinite" begin="0.4s" />
+  </circle>
+
+  <!-- Texte -->
+  <text x="100" y="85" text-anchor="middle"
+        font-family="Inter, system-ui"
+        font-size="12" fill="#374151" opacity="0.8">
+    Chargement en cours...
+  </text>
+</svg>

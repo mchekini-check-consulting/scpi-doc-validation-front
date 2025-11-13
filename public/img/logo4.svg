@@ -1,0 +1,14 @@
+<!-- assets/splash-jira-style.svg -->
+<svg viewBox="0 0 1440 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice">
+  <rect width="100%" height="100%" fill="#f9fafc"/>
+  <polygon points="720,350 780,470 660,470" fill="#0052cc" opacity="0.6">
+    <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="0 720 450" to="360 720 450" dur="14s" repeatCount="indefinite"/>
+  </polygon>
+  <polygon points="720,470 780,590 660,590" fill="#2684ff" opacity="0.45">
+    <animateTransform attributeName="transform" attributeType="XML" type="rotate" from="360 720 550" to="0 720 550" dur="18s" repeatCount="indefinite"/>
+  </polygon>
+  <circle cx="720" cy="450" r="90" fill="#0052cc" opacity="0.1"/>
+  <text x="720" y="460" text-anchor="middle" font-family="Inter, system-ui" font-size="34" font-weight="600" fill="#172b4d">
+    DocManager
+  </text>
+</svg>
