@@ -15,7 +15,9 @@ import Aura from '@primeng/themes/aura';
 import { definePreset } from '@primeng/themes';
 
 import { routes } from './app.routes';
-import { tokenInterceptor } from './core/interceptors/token.interceptor';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+
+
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/i18n/', '.json');
@@ -61,7 +63,7 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     importProvidersFrom(BrowserAnimationsModule),
     provideAnimationsAsync(),
-    provideHttpClient(withInterceptors([tokenInterceptor])),
+    provideHttpClient(withInterceptors([AuthInterceptor])),
     providePrimeNG({
       theme: {
         preset: CustomPreset,

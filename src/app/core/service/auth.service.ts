@@ -1,80 +1,107 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Router } from '@angular/router';
+import { jwtDecode } from 'jwt-decode';
 
-@Injectable({ providedIn: 'root' })
+interface DecodedToken {
+  resource_access?: {
+    'scpi-invest-front'?: {
+      roles?: string[];
+    };
+  };
+  exp?: number;
+  sub?: string;
+  preferred_username?: string;
+  email?: string;
+  name?: string;
+}
+
+const TOKEN_ENDPOINT = 'https://keycloak.check-consulting.net/realms/scpi-realm/protocol/openid-connect/token';
+const CLIENT_ID = 'scpi-invest-front';
+
+@Injectable({
+  providedIn: 'root'
+})
 export class AuthService {
-  private TOKEN_KEY = 'access_token';
+  
+  constructor() {}
 
-  private AUTH_URL =
-    'https://keycloak.check-consulting.net/realms/doc-validation/protocol/openid-connect';
 
-  private CLIENT_ID = 'scpi-doc-validation-front';
-  private REQUIRED_ROLE = 'validator';
+  getToken(): string | null {
+    return localStorage.getItem('token');
+  }
 
-  constructor(private http: HttpClient, private router: Router) {}
+  setToken(token: string): void {
+    localStorage.setItem('token', token);
+  }
 
-  async login(username: string, password: string): Promise<boolean> {
-    const body = new URLSearchParams();
-    body.set('grant_type', 'password');
-    body.set('client_id', this.CLIENT_ID);
-    body.set('username', username);
-    body.set('password', password);
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'application/x-www-form-urlencoded',
-    });
+  removeToken(): void {
+    localStorage.removeItem('token');
+  }
+
+
+  hasRole(role: string): boolean {
+    const token = this.getToken();
+    if (!token) return false;
 
     try {
-      const tokenRes: any = await this.http
-        .post(`${this.AUTH_URL}/token`, body.toString(), { headers })
-        .toPromise();
-
-      if (!tokenRes?.access_token) {
-        console.error('No access_token in token response', tokenRes);
-        return false;
-      }
-
-      const token = tokenRes.access_token;
-
-      const payload = JSON.parse(atob(token.split('.')[1]));
-
-      const roles: string[] = [
-        ...(payload.realm_access?.roles || []),
-        ...(payload.resource_access?.[this.CLIENT_ID]?.roles || []),
-      ];
-
-      console.log('User roles from token:', roles);
-
-      if (this.REQUIRED_ROLE && !roles.includes(this.REQUIRED_ROLE)) {
-        console.error('User missing required role', this.REQUIRED_ROLE);
-        throw new Error('NOT_VALIDATOR');
-      }
-
-      localStorage.setItem(this.TOKEN_KEY, token);
-
-      return true;
-    } catch (e: any) {
-      console.error('LOGIN ERROR', e?.error || e);
-
-      if (e?.error?.error_description) {
-        alert('Keycloak: ' + e.error.error_description);
-      }
-
-      throw e;
+      const decoded: DecodedToken = jwtDecode(token);
+      const roles = decoded.resource_access?.['scpi-invest-front']?.roles || [];
+      return roles.includes(role);
+    } catch (error) {
+      console.error('Erreur de décodage du token:', error);
+      return false;
     }
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.TOKEN_KEY);
-  }
-
-  logout(): void {
-    localStorage.removeItem(this.TOKEN_KEY);
-    this.router.navigate(['/login']);
+  isAdmin(): boolean {
+    return this.hasRole('admin');
   }
 
   isAuthenticated(): boolean {
-    return this.getToken() !== null;
+    const token = this.getToken();
+    if (!token) return false;
+
+    try {
+      const decoded: DecodedToken = jwtDecode(token);
+      const currentTime = Date.now() / 1000;
+      return decoded.exp ? decoded.exp > currentTime : false;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  async login(username: string, password: string): Promise<boolean> {
+    const formData = new URLSearchParams();
+    formData.append('grant_type', 'password');
+    formData.append('client_id', CLIENT_ID);
+    formData.append('username', username);
+    formData.append('password', password);
+    
+    try {
+      const response = await fetch(TOKEN_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: formData.toString()
+      });
+      
+      const data = await response.json();
+      
+      if (response.ok) {
+        this.setToken(data.access_token);
+        return true;
+      } else {
+        throw new Error(data.error_description || 'Erreur d\'authentification');
+      }
+    } catch (error) {
+      console.error('Erreur de connexion:', error);
+      throw error;
+    }
+  }
+
+
+  logout(): void {
+    this.removeToken();
   }
 }
