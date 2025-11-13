@@ -1,62 +1,65 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
 
-const TOKEN_ENDPOINT = 'https://keycloak.check-consulting.net/realms/scpi-realm/protocol/openid-connect/token';
-const CLIENT_ID = 'scpi-invest-front';
-
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly TOKEN_KEY = 'access_token';
+  private TOKEN_KEY = 'access_token';
+  private AUTH_URL = 'https://keycloak.check-consulting.net/realms/scpi-realm/protocol/openid-connect';
 
-  constructor(private router: Router) {}
+  private CLIENT_ID = 'scpi-doc-validation-front'; 
+  private REQUIRED_ROLE = 'validator';
+
+  constructor(private http: HttpClient, private router: Router) {}
 
   async login(username: string, password: string): Promise<boolean> {
-    const formData = new URLSearchParams();
-    formData.append('grant_type', 'password');
-    formData.append('client_id', CLIENT_ID);
-    formData.append('username', username);
-    formData.append('password', password);
+    const body = new URLSearchParams();
+    body.set('grant_type', 'password');
+    body.set('client_id', this.CLIENT_ID);
+    body.set('username', username);
+    body.set('password', password);
+
+    const headers = new HttpHeaders({ 'Content-Type': 'application/x-www-form-urlencoded' });
 
     try {
-      const response = await fetch(TOKEN_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: formData.toString()
-      });
+      const tokenRes: any = await this.http
+        .post(`${this.AUTH_URL}/token`, body.toString(), { headers })
+        .toPromise();
 
-      const data = await response.json();
+      if (!tokenRes?.access_token) return false;
 
-      if (response.ok) {
-     
-        this.setToken(data.access_token);
-        return true;
-      } else {
-        throw new Error(data.error_description || 'Erreur d\'authentification');
+      const token = tokenRes.access_token;
+
+      const payload = JSON.parse(atob(token.split('.')[1]));
+
+      const roles: string[] = [
+        ...(payload.realm_access?.roles || []),
+        ...(payload.resource_access?.['scpi-doc-validation-front']?.roles || [])
+      ];
+
+      if (!roles.includes(this.REQUIRED_ROLE)) {
+        throw new Error('NOT_VALIDATOR');
       }
-    } catch (error) {
-      console.error('Erreur de connexion:', error);
-      throw error;
-    }
-  }
 
-  setToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
+      localStorage.setItem(this.TOKEN_KEY, token);
+
+      return true;
+    } catch (e) {
+      console.error('LOGIN ERROR', e);
+      throw e;
+    }
   }
 
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  isAuthenticated(): boolean {
-    return this.getToken() !== null;
-  }
-
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     this.router.navigate(['/login']);
+  }
+
+  isAuthenticated(): boolean {
+    return this.getToken() !== null;
   }
 }
