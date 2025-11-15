@@ -1,42 +1,46 @@
 <section class="demand-history-section">
-  <!-- <header class="section-header">
+  <header class="section-header">
     <h1 class="section-title">Historique des demandes</h1>
     <p class="section-subtitle">
       Retrouvez ici tous les dossiers clients et accédez au traitement détaillé
       de chaque demande.
     </p>
-  </header> -->
+  </header>
 
   <div class="demand-history-wrapper">
-    <div class="table-card">
+    <div *ngIf="dossiers.length === 0" class="empty-history-card">
+      <div *ngIf="isEmptyLoading" class="empty-loader">
+        <img src="assets/img/logo4.svg" class="loader-svg" alt="loading" />
+      </div>
+      <div *ngIf="!isEmptyLoading">
+        <img src="assets/img/empty.svg" alt="DocManager" />
+      </div>
+    </div>
+
+    <div *ngIf="dossiers.length > 0" class="table-card">
       <div class="table-header-inline">
-        <!-- <div>
-          <h2 class="table-header-title">Suivi des dossiers clients</h2>
-          <p class="table-header-description">
-            Vue consolidée du statut des dossiers et des documents transmis.
-          </p>
-        </div> -->
+        <h2 class="table-header-title">Suivi des dossiers clients</h2>
+        <p class="table-header-description">
+          Vue consolidée du statut des dossiers et des documents transmis.
+        </p>
       </div>
 
       <div class="table-scroll-wrapper">
-        <p-table [value]="dossiers" class="monday-table">
+        <p-table
+          [value]="dossiers"
+          [paginator]="true"
+          [rows]="5"
+          [rowsPerPageOptions]="[5, 10, 20]"
+          paginatorPosition="bottom"
+          class="monday-table"
+        >
           <ng-template pTemplate="header">
             <tr>
               <th class="col-expander"></th>
-              <th class="col-checkbox">
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    class="custom-checkbox"
-                    [checked]="areAllSelected()"
-                    (change)="toggleSelectAll($event)"
-                  />
-                </div>
-              </th>
               <th>Client</th>
               <th>Statut du dossier</th>
               <th>Documents</th>
-              <th>Modifier à</th>
+              <th>Dernière MAJ</th>
               <th class="col-action">Action</th>
             </tr>
           </ng-template>
@@ -48,33 +52,27 @@
             >
               <td class="col-expander">
                 <button
-                  type="button"
                   class="expander-btn"
-                  [ngClass]="{ 'is-open': isExpanded(dossier) }"
-                  (click)="toggleExpand(dossier)"
+                  [ngClass]="{
+                    'is-open': dossier.loading || isExpanded(dossier)
+                  }"
+                  (click)="toggleExpandWithLoader(dossier)"
                 >
                   <i class="pi pi-chevron-right"></i>
                 </button>
               </td>
 
-              <td class="col-checkbox">
-                <div class="checkbox-wrapper">
-                  <input
-                    type="checkbox"
-                    class="custom-checkbox"
-                    [(ngModel)]="dossier.selected"
-                  />
-                </div>
-              </td>
-
               <td class="col-client">
                 <div class="owner-cell">
-                  <div class="owner-avatar">
+                  <div
+                    class="owner-avatar"
+                    [ngStyle]="{
+                      'background-color': getAvatarColor(dossier.userEmail)
+                    }"
+                  >
                     {{ getInitials(dossier.fullName) }}
                   </div>
-                  <span class="owner-name">
-                    {{ dossier.fullName }}
-                  </span>
+                  <span class="owner-name">{{ dossier.fullName }}</span>
                 </div>
               </td>
 
@@ -87,45 +85,64 @@
                 </div>
               </td>
 
-              <td class="col-docs">
-                {{ dossier.docsSummary }}
-              </td>
+              <td class="col-docs">{{ dossier.docsSummary }}</td>
 
-              <td class="col-date">
-                {{ dossier.lastUpdatedAt }}
-              </td>
+              <td class="col-date">{{ dossier.lastUpdatedAt }}</td>
 
               <td class="col-action">
-                <button
-                  type="button"
-                  class="action-button"
-                  (click)="onTreatDossier(dossier)"
+                <ng-container
+                  *ngIf="areAllDocsTreated(dossier); else treatAction"
                 >
-                  <i class="pi pi-play-circle"></i>
-                  Traiter le dossier
-                </button>
+                  <button
+                    class="action-view-button"
+                    (click)="onViewDossier(dossier)"
+                  >
+                    <i class="pi pi-eye"></i>
+                    Voir
+                  </button>
+                </ng-container>
+
+                <ng-template #treatAction>
+                  <button
+                    class="action-button"
+                    (click)="onTreatDossier(dossier)"
+                  >
+                    <i class="pi pi-play-circle"></i>
+                    Traiter
+                  </button>
+                </ng-template>
               </td>
             </tr>
 
-            <tr *ngIf="isExpanded(dossier)" class="subitems-row">
-              <td colspan="7" class="subitems-container">
-                <div class="subitems-wrapper">
+            <tr
+              *ngIf="isExpanded(dossier) || dossier.loading"
+              class="subitems-row"
+            >
+              <td colspan="6" class="subitems-container">
+                <div *ngIf="dossier.loading" class="sub-loader">
+                  <img
+                    src="assets/img/logo4.svg"
+                    class="loader-svg"
+                    alt="Loading"
+                  />
+                </div>
+
+                <div *ngIf="!dossier.loading" class="subitems-wrapper">
                   <table class="sub-table">
                     <thead>
                       <tr>
-                        <th>Type de document</th>
+                        <th>Type</th>
                         <th>Nom du fichier</th>
                         <th>Statut</th>
                         <th>Téléversé le</th>
                         <th>Dernière mise à jour</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       <tr *ngFor="let doc of dossier.documents">
                         <td>
-                          <span class="type-chip">
-                            {{ doc.typeLabel }}
-                          </span>
+                          <span class="type-chip">{{ doc.typeLabel }}</span>
                         </td>
                         <td>{{ doc.fileName }}</td>
                         <td>

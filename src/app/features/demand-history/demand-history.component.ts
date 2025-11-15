@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table';
 import { FormsModule } from '@angular/forms';
-import { ToastModule } from 'primeng/toast';
 import { MessageService } from 'primeng/api';
 import { Router } from '@angular/router';
 
@@ -15,23 +14,38 @@ import {
   documentType,
   documentStatus,
 } from '../../core/models/document.model';
+
+import { DocumentStatusStoreService } from '../../core/store/document-status-store.service';
 import { DocumentService } from '../../core/service/documentService ';
 
 @Component({
   selector: 'app-demand-history',
   standalone: true,
-  imports: [CommonModule, TableModule, FormsModule, ToastModule],
+  imports: [CommonModule, TableModule, FormsModule],
   providers: [MessageService],
   templateUrl: './demand-history.component.html',
   styleUrls: ['./demand-history.component.scss'],
 })
 export class DemandHistoryComponent implements OnInit {
   dossiers: DossierRow[] = [];
-  expandedId: string | null = null;
+  expanded: any = null;
   isLoading = false;
+  isEmptyLoading = true;
+
+  private avatarColors = [
+    '#3B82F6',
+    '#10B981',
+    '#F59E0B',
+    '#EF4444',
+    '#8B5CF6',
+    '#06B6D4',
+    '#EC4899',
+    '#84CC16',
+  ];
 
   constructor(
     private documentService: DocumentService,
+    private statusStore: DocumentStatusStoreService,
     private messageService: MessageService,
     private router: Router
   ) {}
@@ -42,29 +56,41 @@ export class DemandHistoryComponent implements OnInit {
 
   private fetchDocuments(): void {
     this.isLoading = true;
+    this.isEmptyLoading = true;
+
     this.documentService.getAllDocuments().subscribe({
-      next: (docs) => {
-        this.dossiers = this.buildDossiers(docs);
-        this.isLoading = false;
+      next: (result) => {
+        const docs = result.content;
+        const mergedDocs = this.applyLocalOverrides(docs);
+        this.dossiers = this.buildDossiers(mergedDocs);
 
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Succès',
-          detail: `${docs.length} document(s) chargé(s) depuis le serveur.`,
-          life: 3500,
-        });
+        this.isLoading = false;
+        this.isEmptyLoading = this.dossiers.length === 0 ? false : false;
       },
-      error: (err) => {
-        console.error('Erreur lors du chargement des documents:', err);
-        this.isLoading = false;
 
+      error: () => {
+        this.isLoading = false;
+        this.isEmptyLoading = false;
         this.messageService.add({
           severity: 'error',
-          summary: 'Erreur de chargement',
-          detail: 'Impossible de récupérer les documents depuis le serveur.',
-          life: 4000,
+          summary: 'Erreur',
+          detail: 'Impossible de charger les documents.',
         });
       },
+    });
+  }
+
+  private applyLocalOverrides(docs: UserDocument[]): UserDocument[] {
+    return docs.map((doc) => {
+      if (!doc.userEmail || !doc.id) return doc;
+
+      const override = this.statusStore.getStatus(doc.userEmail, doc.id);
+      if (!override) return doc;
+
+      return {
+        ...doc,
+        status: this.mapKeyToBackendStatus(override.statusKey),
+      };
     });
   }
 
@@ -72,9 +98,8 @@ export class DemandHistoryComponent implements OnInit {
     const grouped = new Map<string, UserDocument[]>();
 
     rows.forEach((row) => {
-      const key = row.userEmail;
-      if (!grouped.has(key)) grouped.set(key, []);
-      grouped.get(key)!.push(row);
+      if (!grouped.has(row.userEmail)) grouped.set(row.userEmail, []);
+      grouped.get(row.userEmail)!.push(row);
     });
 
     const dossiers: DossierRow[] = [];
@@ -97,23 +122,20 @@ export class DemandHistoryComponent implements OnInit {
         };
       });
 
-      const allStatusKeys = subRows.map((d) => d.statusKey);
-      const globalStatusKey = this.computeGlobalStatus(allStatusKeys);
-      const globalStatusLabel = this.mapStatusFromKey(globalStatusKey);
-      const latestDate = this.getLatestDate(docs.map((d) => d.lastUpdatedAt));
-
-      const docsSummary = `${
-        subRows.filter((d) => d.statusKey !== 'pending-upload').length
-      } / ${subRows.length} documents`;
+      const globalKey = this.computeGlobalStatus(
+        subRows.map((d) => d.statusKey)
+      );
 
       dossiers.push({
         id: email,
         fullName,
         userEmail: email,
-        statusKey: globalStatusKey,
-        statusLabel: globalStatusLabel,
-        docsSummary,
-        lastUpdatedAt: latestDate,
+        statusKey: globalKey,
+        statusLabel: this.mapStatusFromKey(globalKey),
+        docsSummary: `${
+          subRows.filter((d) => d.statusKey !== 'pending-upload').length
+        } / ${subRows.length} documents`,
+        lastUpdatedAt: this.getLatestDate(docs.map((d) => d.lastUpdatedAt)),
         documents: subRows,
         selected: false,
       });
@@ -139,93 +161,117 @@ export class DemandHistoryComponent implements OnInit {
     }
   }
 
-  private mapStatus(status: documentStatus): {
+  private mapStatus(status: documentStatus | string): {
     statusKey: StatusKey;
     statusLabel: string;
   } {
     switch (status) {
-      case 'PENDING_UPLOAD':
-        return { statusKey: 'pending-upload', statusLabel: 'En attente' };
       case 'UPLOADED':
         return { statusKey: 'uploaded', statusLabel: 'Téléversé' };
       case 'UNDER_REVIEW':
         return { statusKey: 'under-review', statusLabel: 'En revue' };
       case 'VALIDATED':
-        return { statusKey: 'validated', statusLabel: 'Validé' };
+        return { statusKey: 'validated', statusLabel: 'Valider' };
+      case 'REJECTED':
+        return { statusKey: 'rejected', statusLabel: 'À corriger' };
       default:
-        return { statusKey: 'rejected', statusLabel: 'Rejeté' };
+        return { statusKey: 'pending-upload', statusLabel: 'En attente' };
     }
   }
 
+  private mapKeyToBackendStatus(key: StatusKey): documentStatus {
+    const mapping: Record<StatusKey, documentStatus> = {
+      'pending-upload': 'PENDING_UPLOAD',
+      uploaded: 'UPLOADED',
+      'under-review': 'UNDER_REVIEW',
+      validated: 'VALIDATED',
+      rejected: 'REJECTED',
+    };
+
+    return mapping[key];
+  }
+
   private mapStatusFromKey(key: StatusKey): string {
-    switch (key) {
-      case 'pending-upload':
-        return 'En attente';
-      case 'uploaded':
-        return 'Incomplet';
-      case 'under-review':
-        return 'En revue';
-      case 'validated':
-        return 'Complet';
-      case 'rejected':
-        return 'À corriger';
-    }
+    return {
+      'pending-upload': 'En attente',
+      uploaded: 'Incomplet',
+      'under-review': 'En revue',
+      validated: 'Valider',
+      rejected: 'À corriger',
+    }[key];
   }
 
   private computeGlobalStatus(statuses: StatusKey[]): StatusKey {
     if (statuses.includes('rejected')) return 'rejected';
-    if (statuses.includes('under-review')) return 'under-review';
     if (statuses.every((s) => s === 'validated')) return 'validated';
-    if (statuses.some((s) => s === 'uploaded')) return 'uploaded';
+    if (statuses.includes('under-review')) return 'under-review';
+    if (statuses.includes('uploaded')) return 'uploaded';
     return 'pending-upload';
   }
 
   private formatIsoDate(dateIso: string): string {
     if (!dateIso) return '';
-    const date = new Date(dateIso);
-    const dd = String(date.getDate()).padStart(2, '0');
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const yyyy = date.getFullYear();
-    return `${dd}/${mm}/${yyyy}`;
+    const d = new Date(dateIso);
+    return `${String(d.getDate()).padStart(2, '0')}/${String(
+      d.getMonth() + 1
+    ).padStart(2, '0')}/${d.getFullYear()}`;
   }
 
   private getLatestDate(dates: string[]): string {
     if (!dates.length) return '';
-    const latest = dates.reduce((a, b) => (new Date(a) > new Date(b) ? a : b));
-    return this.formatIsoDate(latest);
+    return this.formatIsoDate(
+      dates.reduce((a, b) => (new Date(a) > new Date(b) ? a : b))
+    );
   }
 
-  isExpanded(row: DossierRow): boolean {
-    return this.expandedId === row.id;
+  isExpanded(d: any) {
+    return this.expanded === d && !d.loading;
   }
 
-  toggleExpand(row: DossierRow): void {
-    this.expandedId = this.isExpanded(row) ? null : row.id;
+  toggleExpandWithLoader(d: any) {
+    if (d.loading) return;
+
+    if (this.expanded === d) {
+      this.expanded = null;
+      return;
+    }
+
+    d.loading = true;
+    this.expanded = d;
+
+    setTimeout(() => (d.loading = false), 650);
   }
 
-  areAllSelected(): boolean {
-    return this.dossiers.length > 0 && this.dossiers.every((d) => d.selected);
-  }
-
-  toggleSelectAll(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    this.dossiers.forEach((d) => (d.selected = checked));
-  }
-
-  getInitials(name: string): string {
+  getInitials(name: string) {
     return name
-      ? name
-          .split(' ')
-          .map((p) => p[0])
-          .join('')
-          .toUpperCase()
-      : '';
+      .split(' ')
+      .map((p) => p[0])
+      .join('')
+      .toUpperCase();
   }
 
-  onTreatDossier(dossier: DossierRow): void {
-   this.router.navigate(['/demand-history', 'traitement', dossier.userEmail], {
-  state: { documents: dossier.documents },
-});
+  getAvatarColor(email: string): string {
+    let h = 0;
+    for (let i = 0; i < email.length; i++)
+      h = email.charCodeAt(i) + ((h << 5) - h);
+    return this.avatarColors[Math.abs(h) % this.avatarColors.length];
+  }
+
+  onTreatDossier(d: DossierRow) {
+    this.router.navigate(['/demand-history', 'traitement'], {
+      state: { email: d.userEmail },
+    });
+  }
+
+  onViewDossier(d: DossierRow) {
+    this.router.navigate(['/demand-history', 'traitement'], {
+      state: { email: d.userEmail, readonly: true },
+    });
+  }
+
+  areAllDocsTreated(dossier: DossierRow): boolean {
+    return dossier.documents.every(
+      (d) => d.statusKey === 'validated' || d.statusKey === 'rejected'
+    );
   }
 }
-

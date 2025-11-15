@@ -1,0 +1,87 @@
+<svg width="360" height="260" viewBox="0 0 360 260" xmlns="http://www.w3.org/2000/svg" style="display:block;margin:auto">
+  <defs>
+    <style>
+      @keyframes float {
+        0% { transform: translateY(0px); }
+        50% { transform: translateY(-6px); }
+        100% { transform: translateY(0px); }
+      }
+    </style>
+
+    <linearGradient id="gBlue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#1a73e8"/>
+      <stop offset="100%" stop-color="#4285f4"/>
+    </linearGradient>
+    <linearGradient id="gRed" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ea4335"/>
+      <stop offset="100%" stop-color="#f28b82"/>
+    </linearGradient>
+    <linearGradient id="gGreen" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#34a853"/>
+      <stop offset="100%" stop-color="#81c995"/>
+    </linearGradient>
+    <linearGradient id="gYellow" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fbbc04"/>
+      <stop offset="100%" stop-color="#fde293"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Shapes group -->
+  <g style="animation: float 3s ease-in-out infinite;">
+    <!-- Blue vertical card (Jira style) -->
+    <rect
+      x="80" y="40" width="70" height="120" rx="16"
+      fill="url(#gBlue)" opacity="0.95"
+    />
+
+    <!-- Red rotated card -->
+    <rect
+      x="145" y="70" width="65" height="105" rx="14"
+      transform="rotate(10 145 70)"
+      fill="url(#gRed)" opacity="0.92"
+    />
+
+    <!-- Yellow circle -->
+    <circle
+      cx="245" cy="100" r="42"
+      fill="url(#gYellow)" opacity="0.95"
+    />
+
+    <!-- Small white folder icon inside yellow circle -->
+    <path
+      d="M232 94h20c3 0 5 2 5 5v11c0 3-2 5-5 5h-20c-3 0-5-2-5-5v-11c0-3 2-5 5-5zm0-5c-4 0-7 3-7 7v3c0 1 1 2 2 2h22c1 0 2-1 2-2v-3c0-4-3-7-7-7h-7l-2-3c-1-1-2-2-3-2h-5z"
+      fill="#ffffff"
+      opacity="0.95"
+    />
+
+    <!-- Green rounded bar -->
+    <rect
+      x="210" y="145" width="110" height="26" rx="13"
+      fill="url(#gGreen)" opacity="0.9"
+    />
+  </g>
+
+  <!-- Text -->
+  <text
+    x="180"
+    y="210"
+    text-anchor="middle"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="18"
+    font-weight="700"
+    fill="#0f172a"
+  >
+    Aucun dossier client
+  </text>
+
+  <text
+    x="180"
+    y="232"
+    text-anchor="middle"
+    font-family="Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+    font-size="13"
+    fill="#64748b"
+  >
+    Les dossiers apparaîtront ici dès qu’ils seront disponibles.
+  </text>
+</svg>

@@ -1,70 +1,168 @@
 <section class="traitement-container">
   <div class="traitement-shell">
-    <header class="traitement-header">
-      <div class="header-text">
-        <h1 class="title">Traitement du dossier</h1>
-        <p class="subtitle">
-          Validez ou rejetez les documents envoyés par le client.
-        </p>
-      </div>
-
-      <div class="header-actions">
-        <button class="btn-retour" (click)="goBack()">
-          <i class="pi pi-arrow-left"></i>
-          Retour
-        </button>
-
-        <button class="btn-reject" (click)="rejectDocument()">
-          <i class="pi pi-times"></i>
-          Rejeter
-        </button>
-
-        <button class="btn-validate" (click)="validateDocument()">
-          <i class="pi pi-check"></i>
-          Accepter
-        </button>
-      </div>
-    </header>
-
     <div class="preview-card" *ngIf="currentDocument as doc">
       <div class="preview-header">
-        <h2>{{ doc.typeLabel }}</h2>
+        <div class="preview-header-left">
+          <h2>{{ doc.typeLabel }}</h2>
+          <span class="file-name">{{ doc.fileName }}</span>
+        </div>
 
-        <div class="nav-buttons">
-          <button
-            class="nav-btn"
-            (click)="prevDocument()"
-            [disabled]="currentIndex === 0"
-          >
-            <i class="pi pi-chevron-left"></i>
-          </button>
-
-          <span class="count">
-            {{ currentIndex + 1 }} / {{ documents.length }}
+        <div class="preview-header-right">
+          <span class="doc-chip">
+            <i class="pi pi-folder-open"></i>
+            Document client
           </span>
-
-          <button
-            class="nav-btn"
-            (click)="nextDocument()"
-            [disabled]="currentIndex === documents.length - 1"
-          >
-            <i class="pi pi-chevron-right"></i>
-          </button>
         </div>
       </div>
 
-      <div class="preview-content">
-        <img
-          *ngIf="isImage(doc.fileName)"
-          [src]="docUrl(doc)"
-          class="preview-img"
-        />
+      <div class="preview-layout">
+        <div class="viewer-wrapper">
+          <div class="doc-stage">
+            <button
+              class="viewer-arrow left"
+              (click)="prevDocument()"
+              [disabled]="currentIndex === 0"
+              [class.disabled]="currentIndex === 0"
+            >
+              <i class="pi pi-chevron-left"></i>
+            </button>
 
-        <iframe
-          *ngIf="isPdf(doc.fileName)"
-          [src]="docUrl(doc)"
-          class="preview-pdf">
-        </iframe>
+            <button
+              class="viewer-arrow right"
+              (click)="nextDocument()"
+              [disabled]="currentIndex === documents.length - 1"
+              [class.disabled]="currentIndex === documents.length - 1"
+            >
+              <i class="pi pi-chevron-right"></i>
+            </button>
+
+            <div class="doc-loader" *ngIf="isViewerLoading">
+              <img src="assets/img/logo4.svg" alt="Loading" />
+            </div>
+
+            <div class="doc-viewer" [class.fade-out]="isViewerLoading">
+              <div class="pdf-wrapper" *ngIf="isPdf(doc.fileName)">
+                <iframe
+                  class="pdf-frame"
+                  [src]="doc.safeUrl"
+                  (load)="onViewerLoaded()"
+                ></iframe>
+              </div>
+
+              <img
+                *ngIf="isImage(doc.fileName)"
+                [src]="doc.safeUrl"
+                class="preview-img"
+                alt="Document"
+                (load)="onViewerLoaded()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <aside class="side-menu">
+          <div class="side-menu-header">
+            <div>
+              <div class="side-menu-title">
+                {{
+                  readonlyMode ? "Actions (mode lecture)" : "Actions document"
+                }}
+              </div>
+              <div class="side-menu-sub">{{ doc.typeLabel }}</div>
+            </div>
+
+            <span class="status-pill-sm">{{ doc.statusLabel }}</span>
+          </div>
+
+          <div class="side-actions">
+            <button class="side-btn" (click)="openFullScreen(doc)">
+              <span class="side-btn-left">
+                <i class="pi pi-window-maximize"></i>
+                <span>Plein écran</span>
+              </span>
+              <i class="pi pi-arrow-up-right"></i>
+            </button>
+
+            <button class="side-btn" (click)="downloadDocument(doc)">
+              <span class="side-btn-left">
+                <i class="pi pi-download"></i>
+                <span>Télécharger</span>
+              </span>
+              <span class="side-btn-right">PDF / Image</span>
+            </button>
+
+            <button class="side-btn" (click)="printDocument(doc)">
+              <span class="side-btn-left">
+                <i class="pi pi-print"></i>
+                <span>Imprimer</span>
+              </span>
+            </button>
+
+            <button class="side-btn" (click)="openInNewTab(doc)">
+              <span class="side-btn-left">
+                <i class="pi pi-external-link"></i>
+                <span>Ouvrir dans un onglet</span>
+              </span>
+            </button>
+          </div>
+
+          <div class="side-separator"></div>
+
+          <div class="side-footer-label">Validation du document</div>
+
+          <div class="side-footer-actions">
+            <button class="btn-footer btn-footer-return" (click)="goBack()">
+              <i class="pi pi-arrow-circle-left"></i>
+              Retour à la liste
+            </button>
+
+            <button
+              class="btn-footer btn-footer-reject"
+              (click)="rejectDocument()"
+              [disabled]="
+                readonlyMode ||
+                doc.statusKey === 'validated' ||
+                doc.statusKey === 'rejected'
+              "
+              [class.disabled-action]="
+                readonlyMode ||
+                doc.statusKey === 'validated' ||
+                doc.statusKey === 'rejected'
+              "
+            >
+              <i class="pi pi-ban"></i>
+              Rejeter
+            </button>
+
+            <button
+              class="btn-footer btn-footer-validate"
+              (click)="validateDocument()"
+              [disabled]="
+                readonlyMode ||
+                doc.statusKey === 'validated' ||
+                doc.statusKey === 'rejected'
+              "
+              [class.disabled-action]="
+                readonlyMode ||
+                doc.statusKey === 'validated' ||
+                doc.statusKey === 'rejected'
+              "
+            >
+              <i class="pi pi-check-circle"></i>
+              Accepter
+            </button>
+
+            <button
+              class="btn-footer btn-footer-save"
+              (click)="saveProgress()"
+              [disabled]="readonlyMode || !allDocsTreated || saveLocked"
+              [class.disabled-action]="readonlyMode || !allDocsTreated"
+            >
+              <i class="pi pi-cloud-upload"></i>
+              Enregistrer
+            </button>
+          </div>
+        </aside>
       </div>
 
       <div *ngIf="showValidationAnim" class="validation-anim success">
@@ -73,6 +171,39 @@
 
       <div *ngIf="showRejectAnim" class="validation-anim reject">
         <i class="pi pi-times-circle"></i>
+      </div>
+    </div>
+
+    <div
+      class="fullscreen-backdrop"
+      *ngIf="showFullScreen && currentDocument as fullDoc"
+    >
+      <div class="fullscreen-modal">
+        <div class="fullscreen-header">
+          <div class="fullscreen-title">
+            <span>{{ fullDoc.typeLabel }}</span>
+            <span class="fullscreen-name">{{ fullDoc.fileName }}</span>
+          </div>
+
+          <button class="fullscreen-close" (click)="closeFullScreen()">
+            <i class="pi pi-times"></i>
+          </button>
+        </div>
+
+        <div class="fullscreen-body">
+          <div class="fullscreen-doc">
+            <iframe
+              *ngIf="isPdf(fullDoc.fileName)"
+              [src]="fullDoc.safeUrl"
+            ></iframe>
+
+            <img
+              *ngIf="isImage(fullDoc.fileName)"
+              [src]="fullDoc.safeUrl"
+              alt="Document"
+            />
+          </div>
+        </div>
       </div>
     </div>
   </div>

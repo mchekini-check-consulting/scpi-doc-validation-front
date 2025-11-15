@@ -1,12 +1,14 @@
-// src/app/app.config.ts
-import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
+import {
+  ApplicationConfig,
+  importProvidersFrom,
+  provideZoneChangeDetection,
+} from '@angular/core';
 import { provideRouter } from '@angular/router';
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 
-import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
-
+import { HttpClient } from '@angular/common/http';
 import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 
@@ -14,10 +16,10 @@ import { providePrimeNG } from 'primeng/config';
 import Aura from '@primeng/themes/aura';
 import { definePreset } from '@primeng/themes';
 
+import { provideToastr } from 'ngx-toastr';
+
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
-
-
 
 export function createTranslateLoader(http: HttpClient) {
   return new TranslateHttpLoader(http, '/i18n/', '.json');
@@ -61,9 +63,11 @@ export const appConfig: ApplicationConfig = {
     provideZoneChangeDetection({ eventCoalescing: true }),
 
     provideRouter(routes),
-    importProvidersFrom(BrowserAnimationsModule),
-    provideAnimationsAsync(),
+
+    provideAnimations(),
+
     provideHttpClient(withInterceptors([AuthInterceptor])),
+
     providePrimeNG({
       theme: {
         preset: CustomPreset,
@@ -74,6 +78,7 @@ export const appConfig: ApplicationConfig = {
         },
       },
     }),
+
     importProvidersFrom(
       TranslateModule.forRoot({
         loader: {
@@ -83,5 +88,13 @@ export const appConfig: ApplicationConfig = {
         },
       })
     ),
+
+    provideToastr({
+      positionClass: 'toast-bottom-right',
+      preventDuplicates: true,
+      progressBar: true,
+      timeOut: 3000,
+      closeButton: true,
+    }),
   ],
 };

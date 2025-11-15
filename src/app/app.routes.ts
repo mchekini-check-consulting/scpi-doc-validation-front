@@ -30,7 +30,7 @@ export const routes: Routes = [
       { path: 'demand-history', component: DemandHistoryComponent },
 
       {
-        path: 'demand-history/traitement/:email',
+        path: 'demand-history/traitement',
         component: TraitementDossierComponent,
       },
 
