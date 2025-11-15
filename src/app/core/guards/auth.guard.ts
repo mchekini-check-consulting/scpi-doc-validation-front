@@ -11,13 +11,5 @@ export const authGuard: CanActivateFn = (route, state) => {
     return false;
   }
 
-  const hasSeenSplash = sessionStorage.getItem('splashShown');
-
-  if (!hasSeenSplash) {
-    sessionStorage.setItem('splashShown', 'true'); 
-    router.navigate(['/splash']);
-    return false;
-  }
-
   return true;
 };

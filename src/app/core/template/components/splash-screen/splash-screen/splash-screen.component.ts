@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 
 @Component({
   selector: 'app-splash-screen',
@@ -9,14 +9,17 @@ import { Router } from '@angular/router';
   templateUrl: './splash-screen.component.html',
   styleUrls: ['./splash-screen.component.css'],
 })
-export class SplashScreenComponent {
-constructor(private router: Router) {}
- dots = Array(4); 
-   ngOnInit(): void {
+export class SplashScreenComponent implements OnInit {
+  dots = Array(4);
+
+  constructor(private router: Router, private route: ActivatedRoute) {}
+
+  ngOnInit(): void {
+    const returnUrl =
+      this.route.snapshot.queryParamMap.get('returnUrl') || '/landing';
+
     setTimeout(() => {
-      this.router.navigate(['/dashboard']);
-    }, 2500);
+      this.router.navigateByUrl(returnUrl);
+    }, 2000);
   }
 }
- 
-

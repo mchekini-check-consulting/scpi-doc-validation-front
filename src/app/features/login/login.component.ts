@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from '../../core/service/auth.service';
 
 @Component({
@@ -17,7 +17,11 @@ export class LoginComponent {
   error = '';
   isLoading = false;
 
-  constructor(private router: Router, private authService: AuthService) {}
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private authService: AuthService
+  ) {}
 
   async onLogin(): Promise<void> {
     this.error = '';
@@ -26,10 +30,14 @@ export class LoginComponent {
     try {
       await this.authService.login(this.username, this.password);
 
-      this.router.navigate(['/splash']);
+      const returnUrl =
+        this.route.snapshot.queryParamMap.get('returnUrl') || '/dashboard';
+
+      this.router.navigate(['/splash'], {
+        queryParams: { returnUrl },
+      });
     } catch (err: any) {
       this.error = err.message || 'Erreur de connexion';
-      console.error('Erreur:', this.error);
     } finally {
       this.isLoading = false;
     }
