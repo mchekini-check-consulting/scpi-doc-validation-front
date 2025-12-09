@@ -1,115 +1,171 @@
-<div class="mt-10 p-10">
- <div class="mb-6">
-  <div class="header-container">
-    <div>
-      <h2>Gestion des Permissions</h2>
-      <p class="text-gray-500">
-        Gérez les permissions pour les rôles Standard et Premium
-      </p>
-    </div>
+<div class="p-10">
+  <div>
+    <h2 class="text-2xl font-bold text-gray-900">Gestion des Permissions</h2>
+    <p class="text-gray-500 mt-1">
+      Gérez les permissions pour les rôles Standard et Premium
+    </p>
+  </div>
+  <div class="my-6 flex justify-end items-center">
+    <div class="flex gap-3">
+      <button
+        (click)="openCreateDialog()"
+        class="px-4 py-2 bg-white border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors flex items-center gap-2"
+      >
+        <i class="pi pi-plus"></i>
+        Nouvelle fonctionnalité
+      </button>
 
-    <div>
-      <p-button
-        label="Nouvelle Permission"
-        icon="pi pi-plus"
-        (onClick)="openCreateDialog()"
-      
-      ></p-button>
+      <button
+        (click)="saveAllModifications()"
+        [disabled]="!hasModifications || loading"
+        [ngClass]="{
+          'bg-gray-900 text-white hover:bg-gray-800':
+            hasModifications && !loading,
+          'bg-gray-300 text-gray-500 cursor-not-allowed':
+            !hasModifications || loading
+        }"
+        class="px-4 py-2 rounded-lg font-medium transition-colors flex items-center gap-2"
+      >
+        <i class="pi pi-save"></i>
+        Enregistrer les modifications
+      </button>
     </div>
   </div>
-</div>
 
   <p-toast></p-toast>
 
-  <p-table
-    [value]="permissions"
-    [loading]="loading"
-    [paginator]="true"
-    [rows]="10"
-    [showCurrentPageReport]="true"
-    currentPageReportTemplate="Affichage de {first} à {last} sur {totalRecords} permissions"
-    [rowsPerPageOptions]="[10, 25, 50]"
-    [globalFilterFields]="['permissionName', 'description']"
-    styleClass="p-datatable-striped"
-    #dt
+
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+
+    <div
+      class="grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-600"
+    >
+      <div class="col-span-5">FONCTIONNALITÉ</div>
+      <div class="col-span-3 text-center">RÔLE STANDARD</div>
+      <div class="col-span-2 text-center">RÔLE PREMIUM</div>
+      <div class="col-span-2 text-center">STATUT</div>
+    </div>
+
+
+    <div class="divide-y divide-gray-200">
+      <div
+        *ngFor="let permission of permissions"
+        class="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-gray-50 transition-colors items-center"
+      >
+ 
+        <div class="col-span-5">
+          <div class="font-semibold text-gray-900">
+            {{ permission.name || permission.permissionName }}
+          </div>
+          <div class="text-sm text-gray-500">
+            {{ permission.description || "Aucune description" }}
+          </div>
+        </div>
+
+    
+        <div class="col-span-3 flex justify-center">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              [name]="'role-' + permission.permissionName"
+              [checked]="getSelectedRole(permission) === 'standard'"
+              (change)="onRoleSelect(permission, 'standard')"
+              class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+            />
+            <span class="text-sm font-medium text-gray-700"
+              >Standard + Premium</span
+            >
+          </label>
+        </div>
+
+
+        <div class="col-span-2 flex justify-center">
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input
+              type="radio"
+              [name]="'role-' + permission.permissionName"
+              [checked]="getSelectedRole(permission) === 'premium'"
+              (change)="onRoleSelect(permission, 'premium')"
+              class="w-4 h-4 text-yellow-600 focus:ring-yellow-500"
+            />
+            <span
+              class="text-sm font-medium text-gray-700 flex items-center gap-1"
+            >
+              <i class="pi pi-star-fill text-yellow-500 text-xs"></i>
+              Premium seul
+            </span>
+          </label>
+        </div>
+
+      
+        <div class="col-span-2 flex justify-center">
+          <span
+            [ngClass]="{
+              'bg-green-100 text-green-800':
+                getSelectedRole(permission) === 'standard',
+              'bg-yellow-100 text-yellow-800':
+                getSelectedRole(permission) === 'premium',
+              'bg-gray-100 text-gray-800':
+                getSelectedRole(permission) === 'none'
+            }"
+            class="px-3 py-1 text-xs font-medium rounded-full"
+          >
+            {{ getStatusLabel(permission) }}
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div
+    *ngIf="!loading && permissions.length === 0"
+    class="bg-white rounded-lg shadow flex flex-col items-center gap-3 py-12"
   >
-    <ng-template pTemplate="header">
-      <tr>
-        <th pSortableColumn="permissionName" class="bg-gray-50">
-          <div class="flex items-center gap-2">
-            Fonctionnalité
-            <p-sortIcon field="permissionName"></p-sortIcon>
-          </div>
-        </th>
-        <th pSortableColumn="description" class="bg-gray-50">
-          <div class="flex items-center gap-2">
-            Description
-            <p-sortIcon field="description"></p-sortIcon>
-          </div>
-        </th>
-        <th class="bg-gray-50 text-center">Rôle Standard</th>
-        <th class="bg-gray-50 text-center">Rôle Premium</th>
-      </tr>
-    </ng-template>
+    <i class="pi pi-lock text-6xl text-gray-300"></i>
+    <span class="text-gray-400 text-lg">Aucune permission trouvée</span>
+  </div>
 
-    <ng-template pTemplate="body" let-permission>
-      <tr class="hover:bg-gray-50 transition-colors">
-        <td class="font-semibold text-gray-700">
-          {{ permission.permissionName }}
-        </td>
-        <td class="text-gray-600">
-          {{ permission.description || "-" }}
-        </td>
-        <td class="text-center">
-          <p-checkbox
-            [(ngModel)]="permission.assignedToStandard"
-            [binary]="true"
-            (onChange)="onStandardChange(permission, $event.checked)"
-            inputId="standard-{{ permission.permissionName }}"
-          ></p-checkbox>
-        </td>
-        <td class="text-center">
-          <p-checkbox
-            [(ngModel)]="permission.assignedToPremium"
-            [binary]="true"
-            (onChange)="onPremiumChange(permission, $event.checked)"
-            inputId="premium-{{ permission.permissionName }}"
-          ></p-checkbox>
-        </td>
-      </tr>
-    </ng-template>
 
-    <ng-template pTemplate="emptymessage">
-      <tr>
-        <td colspan="4" class="text-center">
-          <div class="flex flex-col items-center gap-3 py-12">
-            <i class="pi pi-lock text-6xl text-gray-300"></i>
-            <span class="text-gray-400 text-lg">Aucune permission trouvée</span>
-          </div>
-        </td>
-      </tr>
-    </ng-template>
-  </p-table>
+  <div
+    *ngIf="loading"
+    class="bg-white rounded-lg shadow flex justify-center py-12"
+  >
+    <i class="pi pi-spin pi-spinner text-4xl text-blue-500"></i>
+  </div>
 </div>
 
 <p-dialog
   header="Créer une nouvelle permission"
   [(visible)]="displayDialog"
   [modal]="true"
-  [style]="{ width: '450px' }"
+  [style]="{ width: '500px' }"
   [draggable]="false"
   [resizable]="false"
 >
   <div class="flex flex-col gap-4">
     <div class="flex flex-col gap-2">
+      <label for="name" class="font-semibold text-gray-700">
+        Nom <span class="text-red-500">*</span>
+      </label>
+      <input
+        pInputText
+        id="name"
+        [(ngModel)]="newPermission.name"
+        placeholder="Ex: Accès au comparateur"
+        class="w-full"
+      />
+    </div>
+
+    <div class="flex flex-col gap-2">
       <label for="permissionName" class="font-semibold text-gray-700">
-        Nom de la permission <span class="text-red-500">*</span>
+        Nom technique <span class="text-red-500">*</span>
       </label>
       <input
         pInputText
         id="permissionName"
         [(ngModel)]="newPermission.permissionName"
-        placeholder="Ex: VIEW_ANALYTICS"
+        placeholder="Ex: VIEW_COMPARATOR"
         class="w-full"
       />
       <small class="text-gray-500">
@@ -130,15 +186,44 @@
         class="w-full"
       ></textarea>
     </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="font-semibold text-gray-700">Attribution par défaut</label>
+      <div class="flex gap-4">
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            type="radio"
+            [(ngModel)]="newPermissionType"
+            value="standard"
+            class="w-4 h-4 text-blue-600"
+          />
+          <span>Standard et Premium</span>
+        </label>
+        <label class="flex items-center gap-2 cursor-pointer">
+          <input
+            type="radio"
+            [(ngModel)]="newPermissionType"
+            value="premium"
+            class="w-4 h-4 text-yellow-600"
+          />
+          <span>Premium uniquement</span>
+        </label>
+      </div>
+    </div>
   </div>
 
   <ng-template pTemplate="footer">
-  
-    <p-button
-      label="Créer"
-      icon="pi pi-check"
-      (onClick)="savePermission()"
-     
-    ></p-button>
+    <button
+      (click)="displayDialog = false"
+      class="px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+    >
+      Annuler
+    </button>
+    <button
+      (click)="savePermission()"
+      class="px-4 py-2 bg-blue-600 text-white hover:bg-blue-700 rounded-lg transition-colors"
+    >
+      Créer
+    </button>
   </ng-template>
 </p-dialog>

@@ -7,7 +7,7 @@ import { UserDocument } from '../models/document.model';
   providedIn: 'root',
 })
 export class DocumentService {
-  private readonly API_URL = '/api/v1/documents';
+  private readonly API_URL = '/validation-api/v1/documents';
 
   constructor(private http: HttpClient) {}
 
