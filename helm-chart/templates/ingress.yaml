@@ -10,7 +10,7 @@ spec:
     - host: {{ if .Values.ingressPrefix }}{{ .Values.ingressPrefix }}.{{ end }}doc-manager.check-consulting.net
       http:
         paths:
-          - path: /api
+          - path: /validation-api
             pathType: Prefix
             backend:
               service:
