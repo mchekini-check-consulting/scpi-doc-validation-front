@@ -11,7 +11,7 @@ export class DocumentService {
 
   constructor(private http: HttpClient) {}
 
-  getAllDocuments(page = 0, size = 20): Observable<any> {
+  getAllDocuments(page = 0, size = 100): Observable<any> {
     const params = new HttpParams().set('page', page).set('size', size);
 
     return this.http.get<any>(this.API_URL, { params });
